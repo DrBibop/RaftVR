@@ -1,0 +1,77 @@
+{
+  "name": "RaftVR",
+  "author": "DrBibop",
+  "description": "A virtual reality mod for Raft",
+  "version": "1.0",
+  "license": "GNU AGPLv3",
+  "icon": "icon.png",
+  "banner": "banner.jpg",
+  "gameVersion": "1.0",
+  "requiredByAllPlayers": false,
+  "updateUrl": "https://www.raftmodding.com/api/v1/mods/raftvr/version.txt",
+  "isModPermanent": true,
+  "excludedFiles": [],
+  "modSettings": [
+	{
+      "type": "button",
+      "name": "calibrate",
+      "text": "Calibrate & Recenter"
+    },
+	{
+      "type": "checkbox",
+      "name": "snapTurn",
+      "text": "Snap Turn",
+      "access": "both",
+      "default": true
+    },
+	{
+      "type": "slider",
+      "name": "snapTurnAngle",
+      "text": "Snap Turn Angle",
+      "access": "both",
+      "default": 45,
+      "range": {
+        "type": "number",
+        "min": 30,
+        "max": 180,
+        "decimals": 0
+      }
+    },
+	{
+      "type": "slider",
+      "name": "smoothTurnSpeed",
+      "text": "Smooth Turn Speed",
+      "access": "both",
+      "default": 90,
+      "range": {
+        "type": "number",
+        "min": 45,
+        "max": 360,
+        "decimals": 0
+      }
+    },
+	{
+      "type": "checkbox",
+      "name": "seatedMode",
+      "text": "Seated Mode",
+      "access": "both",
+      "default": false
+    },
+	{
+      "type": "combobox",
+      "name": "playspaceCenter",
+      "text": "Show Center of Playspace",
+      "access": "both",
+      "default": "When Far",
+      "values": [ "Always", "When Far", "Never" ]
+    },
+	{
+      "type": "data",
+      "name": "hiddenSettings",
+      "access": "both",
+      "default": {
+		"armScale": "0.0"
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+/RaftVRLoader/RaftVRLoader/[Oo]bj/
+/RaftVRLoader/RaftVRLoader/[Bb]in/
+/RaftVRLoader/RaftVRLoader/Assemblies/RaftVRMod.dll.copyonly
+/RaftVRLoader/packages/
+/RaftVRLoader/.vs/
+/RaftVRMod/RaftVRMod/[Oo]bj/
+/RaftVRMod/RaftVRMod/[Bb]in/
+/RaftVRMod/packages/
+/RaftVRMod/.vs/
+*.rmod
+*.lnk
