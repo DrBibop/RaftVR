@@ -52,20 +52,21 @@
                   "east" : {
                      "output" : "/actions/gameplay/in/turn_right"
                   },
-                  "north" : {
-                     "output" : "/actions/gameplay/in/next_item"
-                  },
+                "north": {
+                  "output": "/actions/gameplay/in/previous_item"
+                },
                   "south" : {
-                     "output" : "/actions/gameplay/in/previous_item"
+                     "output" : "/actions/gameplay/in/next_item"
                   },
                   "west" : {
                      "output" : "/actions/gameplay/in/turn_left"
                   }
                },
                "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
+              "parameters": {
+                "overlap_pct": "0",
+                "sub_mode": "touch"
+              },
                "path" : "/user/hand/right/input/joystick"
             },
             {

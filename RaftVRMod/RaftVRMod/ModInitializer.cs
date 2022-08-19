@@ -28,13 +28,14 @@ namespace RaftVR
         private void OnSettingsAPILoaded()
         {
             VRFirstLaunchBox.apiLoaded = true;
+            VRFirstLaunchBox.alreadyChoseSettings = VRConfigs.Runtime != VRConfigs.VRRuntime.None;
 
             if (!loaded) return;
 
             if (VRFirstLaunchBox.instance)
-                VRFirstLaunchBox.instance.StartFirstTimeSetup();
+                VRFirstLaunchBox.instance.StartDialog();
             else if (VRConfigs.Runtime == VRConfigs.VRRuntime.None) 
-                FirstTimeSetup();
+                OpenDialog();
         }
 
         private void Start()
@@ -57,14 +58,14 @@ namespace RaftVR
                     loaded = true;
                     VRFirstLaunchBox.alreadyPatched = true;
                     if (VRConfigs.Runtime == VRConfigs.VRRuntime.None)
-                        FirstTimeSetup();
+                        OpenDialog();
                     else
                         StartMod();
                     break;
                 case VRPatcher.PatchErrorCode.Success:
                     loaded = true;
                     Debug.Log("[RaftVR] VR has been patched in! Restart the game for the patch to take effect.");
-                    FirstTimeSetup();
+                    OpenDialog();
                     break;
                 default:
                     Debug.LogError("[RaftVR] Due to an error in the patching process, the mod cannot be loaded.");
@@ -131,7 +132,7 @@ namespace RaftVR
             }
         }
 
-        private void FirstTimeSetup()
+        private void OpenDialog()
         {
             StartMenuScreen menuScreen = FindObjectOfType<StartMenuScreen>();
 

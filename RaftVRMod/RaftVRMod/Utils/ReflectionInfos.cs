@@ -40,6 +40,8 @@ namespace RaftVR.Utils
 
         internal static FieldInfo personControllerNetworkPlayerField = GetFieldInfo(typeof(PersonController), "playerNetwork");
 
+        internal static FieldInfo macheteQuestTagField = GetFieldInfo(typeof(Machete), "macheteInteractTagName");
+
         internal static MethodInfo usableItemUse = GetMethodInfo(typeof(UseItemController), "Use");
 
         internal static MethodInfo netAttemptCaptureMethod = GetMethodInfo(typeof(SweepNet), "AttemptCaptureWithNet");
@@ -50,6 +52,8 @@ namespace RaftVR.Utils
         internal static MethodInfo hookStartCollectingMethod = GetMethodInfo(typeof(Hook), "StartCollecting");
         internal static MethodInfo hookStopCollectingMethod = GetMethodInfo(typeof(Hook), "StopCollecting");
         internal static MethodInfo hookFinishGatheringMethod = GetMethodInfo(typeof(Hook), "FinishGathering");
+
+        internal static MethodInfo macheteQuestInteract = GetMethodInfo(typeof(Machete), "MacheteInteractWithQuest");
 
         private static FieldInfo GetFieldInfo(Type classType, string fieldName)
         {

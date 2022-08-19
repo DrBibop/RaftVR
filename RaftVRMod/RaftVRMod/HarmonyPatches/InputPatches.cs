@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Reflection;
 
 namespace RaftVR.HarmonyPatches
 {
@@ -166,6 +167,33 @@ namespace RaftVR.HarmonyPatches
         static void RegisterLastKeybind(Keybind __instance)
         {
             VRInput.lastIdentifierKeyRetrieved = __instance.Identifier;
+        }
+    }
+
+    [HarmonyPatch]
+    class RespawnCoroutinePatch
+    {
+        // Thank you Fynikoto for helping me with transpiling this IEnumerator!
+        static MethodBase TargetMethod()
+        {
+            return typeof(Player).GetNestedType("<RespawnWait>d__40", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext", BindingFlags.Instance | BindingFlags.NonPublic);
+        }
+
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> Player_ReplaceRespawnAnyKey(IEnumerable<CodeInstruction> instructions, ILGenerator ilGen)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            int codeIndex = codes.FindIndex(x => x.Calls(typeof(Input).GetProperty("anyKeyDown").GetGetMethod()));
+
+            if (codeIndex != -1)
+            {
+                codes.RemoveAt(codeIndex);
+
+                codes.Insert(codeIndex, new CodeInstruction(OpCodes.Call, typeof(VRInput).GetMethod("IsAnyButtonDown", (BindingFlags)(-1))));
+            }
+
+            return codes.AsEnumerable();
         }
     }
 }

@@ -13,6 +13,7 @@ namespace RaftVR.ItemComponents
         float damage;
         float cooldown;
         float cooldownTimer;
+        CanvasHelper canvas;
 
         protected virtual void Start()
         {
@@ -34,6 +35,8 @@ namespace RaftVR.ItemComponents
             cooldown = item.settings_usable.UseButtonCooldown;
             ReflectionInfos.usableUseAnimationField.SetValue(item.settings_usable, PlayerAnimation.None);
 
+            canvas = ComponentManager<CanvasHelper>.Value;
+
             // Required for collision detection to work
             gameObject.layer = LayerMask.NameToLayer("Projectiles");
         }
@@ -46,23 +49,26 @@ namespace RaftVR.ItemComponents
         private void Update()
         {
             if (cooldownTimer > 0)
+            {
                 cooldownTimer = Mathf.Max(0f, cooldownTimer - Time.deltaTime);
+                canvas.SetLoadCircle(cooldownTimer / cooldown);
+            }
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnCollisionStay(Collision collision)
         {
-            if (cooldownTimer > 0) return;
+            if (cooldownTimer > 0 || playerNetwork.PlayerScript.IsDead) return;
             if (weapon.attackMask == (weapon.attackMask | ( 1 << collision.gameObject.layer)))
             {
-                weapon.OnMeleeStart();
-                Network_Entity_Redirect componentInParent = collision.gameObject.GetComponentInParent<Network_Entity_Redirect>();
+                Network_Entity_Redirect entityInParent = collision.gameObject.GetComponentInParent<Network_Entity_Redirect>();
 
                 // Raft doesn't have a separate method for this, so I had to borrow from them :P
-                if (componentInParent != null)
+                if (entityInParent != null)
                 {
-                    Network_Entity entity = componentInParent.entity;
+                    Network_Entity entity = entityInParent.entity;
                     if (entity != null)
                     {
+                        weapon.OnMeleeStart();
                         if (goThroughInvurnability && entity.IsInvurnerable)
                         {
                             entity.IsInvurnerable = false;
@@ -72,6 +78,20 @@ namespace RaftVR.ItemComponents
                         if (!entity.IsInvurnerable && entity.removesDurabilityWhenHit)
                         {
                             playerNetwork.Inventory.RemoveDurabillityFromHotSlot(1);
+                        }
+                    }
+                }
+
+                if (weapon is Machete)
+                {
+                    if (collision.transform.tag == (string)ReflectionInfos.macheteQuestTagField.GetValue(weapon as Machete))
+                    {
+                        QuestEventBase questEventInparent = collision.collider.transform.GetComponentInParent<QuestEventBase>();
+                        if (questEventInparent != null)
+                        {
+                            cooldownTimer = cooldown;
+                            weapon.OnMeleeStart();
+                            ReflectionInfos.macheteQuestInteract.Invoke(weapon as Machete, new object[] { questEventInparent });
                         }
                     }
                 }

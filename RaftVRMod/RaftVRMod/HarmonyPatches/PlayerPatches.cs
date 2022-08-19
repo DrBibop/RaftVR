@@ -60,6 +60,7 @@ namespace RaftVR.HarmonyPatches
             }
 
             MeleeWeapon[] meleeWeapons = __instance.rightHandParent.GetComponentsInChildren<MeleeWeapon>(true);
+            MeleeWeapon machete = meleeWeapons.First(x => x.gameObject.name.Contains("Machete"));
 
             for (int i = 0; i < meleeWeapons.Length; i++)
             {
@@ -67,6 +68,9 @@ namespace RaftVR.HarmonyPatches
 
                 if (meleeWeapon is Machete)
                 {
+                    if (meleeWeapon.attackMask != machete.attackMask)
+                        meleeWeapon.attackMask = machete.attackMask;
+
                     CapsuleCollider collider = meleeWeapon.gameObject.AddComponent<CapsuleCollider>();
 
                     collider.center = new Vector3(0f, 0.35f, 0f);
@@ -500,6 +504,13 @@ namespace RaftVR.HarmonyPatches
                 __instance.SelectHotslot(newSlot);
                 HotbarController.instance.RefreshVisibility();
             }
+        }
+
+        [HarmonyPatch(typeof(ThirdPerson), "SetThirdPersonState")]
+        [HarmonyPrefix]
+        static bool PreventThirdPerson()
+        {
+            return false;
         }
     }
 }

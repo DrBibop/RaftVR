@@ -10,6 +10,7 @@ namespace RaftVR.ItemComponents
         private Network_Player playerNetwork;
         private float cooldown;
         private float cooldownTimer;
+        private CanvasHelper canvas;
 
         private void Start()
         {
@@ -24,6 +25,8 @@ namespace RaftVR.ItemComponents
 
             cooldown = item.settings_usable.UseButtonCooldown;
 
+            canvas = ComponentManager<CanvasHelper>.Value;
+
             // Required for collision detection to work
             gameObject.layer = LayerMask.NameToLayer("Projectiles");
         }
@@ -36,10 +39,13 @@ namespace RaftVR.ItemComponents
         private void Update()
         {
             if (cooldownTimer > 0)
+            {
                 cooldownTimer = Mathf.Max(0f, cooldownTimer - Time.deltaTime);
+                canvas.SetLoadCircle(cooldownTimer / cooldown);
+            }
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnCollisionStay(Collision collision)
         {
             if (cooldownTimer > 0 || PlayerItemManager.IsBusy) return;
 

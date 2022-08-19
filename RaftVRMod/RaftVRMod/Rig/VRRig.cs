@@ -115,6 +115,10 @@ namespace RaftVR.Rig
 
         internal List<Canvas> worldCanvases = new List<Canvas>();
 
+        private GameObject interactionRay;
+
+        private bool interactionRayShown;
+
         private IEnumerator FixCameraStuffOneFrameLater()
         {
             yield return null;
@@ -176,6 +180,9 @@ namespace RaftVR.Rig
             DontDestroyOnLoad(playspaceCenterIndicator);
 
             centerIndicatorMat = playspaceCenterIndicator.GetComponentInChildren<MeshRenderer>().material;
+
+            interactionRay = Instantiate(VRAssetsManager.interactionRayPrefab, RightController.transform);
+            interactionRay.SetActive(false);
         }
 
         public void AddCameraCanvas(Canvas canvas)
@@ -236,7 +243,17 @@ namespace RaftVR.Rig
             }
         }
 
-        public void InitHUD()
+        internal void ShowInteractionRay()
+        {
+            if (interactionRayShown || !VRConfigs.ShowInteractionRay || CanvasHelper.ActiveMenu != MenuType.None) return;
+
+            interactionRayShown = true;
+
+            if (!interactionRay.activeSelf)
+                interactionRay.SetActive(true);
+        }
+
+        internal void InitHUD()
         {
             GameObject canvasesObject = GameObject.Find("Canvases");
 
@@ -498,6 +515,14 @@ namespace RaftVR.Rig
                 canvasHolderRotation = canvasHolderRotation.SmoothDamp(uiCamera.transform.rotation, ref deriv, 0.07f);
                 canvasHolder.rotation = Quaternion.LookRotation(canvasHolderRotation * Vector3.forward, uiCamera.transform.up);
             }
+
+            if (!interactionRayShown)
+            {
+                if (interactionRay.activeSelf)
+                    interactionRay.SetActive(false);
+            }
+
+            interactionRayShown = false;
         }
     }
 }

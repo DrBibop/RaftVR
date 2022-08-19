@@ -187,12 +187,12 @@ namespace RaftVR.Inputs
 
         public bool GetNextItem()
         {
-            return rightJoystick.y > 0.8f;
+            return rightJoystick.y < -0.8f;
         }
 
         public bool GetPreviousItem()
         {
-            return rightJoystick.y < -0.8f;
+            return rightJoystick.y > 0.8f;
         }
 
         public bool GetNotebook()

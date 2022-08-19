@@ -26,6 +26,7 @@ namespace RaftVR.Inputs
             { "X", "X"},
             { "Y", "Y"},
             { "Joystick", "Stick"},
+            { "Stick", "Stick"},
             { "Trackpad", "Pad"},
             { "Grip", "Grip"},
             { "Trigger", "Trigger"},

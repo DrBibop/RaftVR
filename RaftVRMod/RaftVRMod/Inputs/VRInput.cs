@@ -214,6 +214,17 @@ namespace RaftVR.Inputs
             return false;
         }
 
+        public static bool IsAnyButtonDown()
+        {
+            Update();
+            foreach (ButtonState buttonState in buttonStates.Values)
+            {
+                if (buttonState.state) return true;
+            }
+
+            return Input.anyKeyDown;
+        }
+
         private static bool TryGetButtonState(string identifier, out ButtonState value)
         {
             Update();

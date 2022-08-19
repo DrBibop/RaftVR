@@ -64,14 +64,6 @@ namespace RaftVR.HarmonyPatches
             return true;
         }
 
-        [HarmonyPatch(typeof(ThrowableComponent), "Throw")]
-        [HarmonyPrefix]
-        static bool ThrowableComponent_DebugForce(Vector3 force)
-        {
-            Debug.LogWarning(force);
-            return true;
-        }
-
         [HarmonyPatch(typeof(ThrowableComponent), "HandleLocalClient")]
         [HarmonyTranspiler]
         static IEnumerable<CodeInstruction> ThrowableComponent_UseMotionForce(IEnumerable<CodeInstruction> instructions, ILGenerator ilGen)

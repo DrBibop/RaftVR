@@ -58,6 +58,13 @@
       "default": false
     },
 	{
+      "type": "checkbox",
+      "name": "interactionRay",
+      "text": "Show Interaction Ray",
+      "access": "both",
+      "default": true
+    },
+	{
       "type": "combobox",
       "name": "playspaceCenter",
       "text": "Show Center of Playspace",

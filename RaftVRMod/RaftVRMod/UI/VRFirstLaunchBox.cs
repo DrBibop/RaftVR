@@ -18,6 +18,7 @@ namespace RaftVR.UI
 
         internal static bool alreadyPatched = false;
         internal static bool apiLoaded = false;
+        internal static bool alreadyChoseSettings = false;
 
         private void Awake()
         {
@@ -51,17 +52,31 @@ namespace RaftVR.UI
         {
             if (apiLoaded)
             {
-                StartFirstTimeSetup();
+                StartDialog();
             }
             else
             {
-                UpdateDialog("Install and load ExtraSettingsAPI to setup RaftVR.", "Close", "Close", Button_Later, Button_Later);
-                button1.gameObject.SetActive(false);
+                UpdateDialogSingleOption("Install and load ExtraSettingsAPI to setup RaftVR.", "Close", Button_Later);
             }
         }
 
-        private void UpdateDialog(string message, string leftButtonText, string rightButtonText, UnityAction leftButtonAction, UnityAction rightButtonAction)
+        internal void StartDialog()
         {
+            if (alreadyChoseSettings)
+            {
+                ChangeToFinished();
+            }
+            else
+            {
+                StartFirstTimeSetup();
+            }
+        }
+
+        private void UpdateDialog(string message, string leftButtonText, string rightButtonText, UnityAction leftButtonAction, UnityAction rightButtonAction, bool reactivateFirstButton = true)
+        {
+            if (reactivateFirstButton && !button1.gameObject.activeSelf)
+                button1.gameObject.SetActive(true);
+
             messageText.text = message;
 
             button1Text.text = leftButtonText;
@@ -74,13 +89,16 @@ namespace RaftVR.UI
             button2.onClick.AddListener(rightButtonAction);
         }
 
+        private void UpdateDialogSingleOption(string message, string buttonText, UnityAction buttonAction)
+        {
+            UpdateDialog(message, buttonText, buttonText, buttonAction, buttonAction, false);
+            button1.gameObject.SetActive(false);
+        }
+
         internal void StartFirstTimeSetup()
         {
             if (!IsOpen)
                 Open();
-
-            if (!button1.gameObject.activeSelf)
-                button1.gameObject.SetActive(true);
 
             UpdateDialog("RaftVR has loaded successfully! Choose your preferred VR runtime.", "Oculus", "SteamVR", Button_Oculus, Button_SteamVR);
         }

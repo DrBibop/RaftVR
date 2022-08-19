@@ -19,6 +19,7 @@ namespace RaftVR.Configs
         private static float _turnAngle = 45;
         private static bool _seatedMode = false;
         private static bool _isLeftHanded = false;
+        private static bool _interactionRay = true;
         private static PlayspaceCenterDisplay _playspaceCenterDisplay = PlayspaceCenterDisplay.WhenFar;
         private static float _armScale = 1;
 
@@ -120,6 +121,12 @@ namespace RaftVR.Configs
                 VRRig.instance.SetVerticalOffset(0);
                 VRRig.instance.UpdateWorldCanvasesPosition();
             }
+        }
+
+        public static bool ShowInteractionRay
+        {
+            get => _interactionRay;
+            internal set { _interactionRay = value; }
         }
 
         public static void ShowCalibrateCanvas()

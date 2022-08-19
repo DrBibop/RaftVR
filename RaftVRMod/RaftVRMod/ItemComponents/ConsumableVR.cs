@@ -19,7 +19,7 @@ namespace RaftVR.ItemComponents
         {
             if (PlayerItemManager.IsBusy || CanvasHelper.ActiveMenu != MenuType.None) return;
 
-            if (Vector3.Distance(VRRig.instance.DominantController.transform.position, VRRig.instance.Mouth.position) < 0.08f)
+            if (Vector3.Distance(VRRig.instance.DominantController.transform.position, VRRig.instance.Mouth.position) < 0.1f)
             {
                 consumeDelay += Time.deltaTime;
             }

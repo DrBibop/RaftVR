@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using RaftVR.Configs;
+using RaftVR.Rig;
 using RaftVR.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -152,6 +154,25 @@ namespace RaftVR.HarmonyPatches
 
                 codes.Insert(codeIndex, new CodeInstruction(OpCodes.Ldstr, "Turn"));
                 codes.Insert(codeIndex + 1, new CodeInstruction(OpCodes.Call, typeof(Inputs.VRInput).GetMethod("GetAxis", (BindingFlags)(-1))));
+            }
+
+            return codes.AsEnumerable();
+        }
+
+        [HarmonyPatch(typeof(Pickup), "RaycastForRayInteractables")]
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> Pickup_ShowInteractionRay(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            int codeIndex = codes.FindIndex(x => x.Calls(typeof(IRaycastable).GetMethod("OnIsRayed", (BindingFlags)(-1))));
+
+            if (codeIndex != -1)
+            {
+                codeIndex++;
+
+                codes.Insert(codeIndex, new CodeInstruction(OpCodes.Call, typeof(VRRig).GetProperty("instance", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
+                codes.Insert(codeIndex + 1, new CodeInstruction(OpCodes.Call, typeof(VRRig).GetMethod("ShowInteractionRay", (BindingFlags)(-1))));
             }
 
             return codes.AsEnumerable();

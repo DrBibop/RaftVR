@@ -11,6 +11,7 @@ namespace RaftVR
         internal static GameObject handCanvasPrefab;
         internal static GameObject playspaceCenterIndicatorPrefab;
         internal static GameObject calibrateCanvasPrefab;
+        internal static GameObject interactionRayPrefab;
 
         internal static void Init(AssetBundle vrAssetsBundle)
         {
@@ -20,6 +21,7 @@ namespace RaftVR
             handCanvasPrefab = vrAssetsBundle.LoadAsset<GameObject>("HandCanvas");
             playspaceCenterIndicatorPrefab = vrAssetsBundle.LoadAsset<GameObject>("PlayspaceCenterIndicator");
             calibrateCanvasPrefab = vrAssetsBundle.LoadAsset<GameObject>("CalibrateCanvas");
+            interactionRayPrefab = vrAssetsBundle.LoadAsset<GameObject>("InteractionRay");
         }
 
         internal static void Unload()

@@ -319,7 +319,6 @@
     <Compile Include="HarmonyPatches\ThrowablePatches.cs" />
     <Compile Include="HarmonyPatches\InputPatches.cs" />
     <Compile Include="HarmonyPatches\InteractionPatches.cs" />
-    <Compile Include="HarmonyPatches\HPatch_Hotbar_HandleHotbarSelection.cs" />
     <Compile Include="HarmonyPatches\PlayerPatches.cs" />
     <Compile Include="HarmonyPatches\ToolsPatches.cs" />
     <Compile Include="ItemComponents\AxeVR.cs" />

@@ -49,11 +49,11 @@
             },
             {
                "inputs" : {
-                  "north" : {
-                     "output" : "/actions/gameplay/in/next_item"
-                  },
+                "north": {
+                  "output": "/actions/gameplay/in/previous_item"
+                },
                   "south" : {
-                     "output" : "/actions/gameplay/in/previous_item"
+                     "output" : "/actions/gameplay/in/next_item"
                   }
                },
                "mode" : "dpad",

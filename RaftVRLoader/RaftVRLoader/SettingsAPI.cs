@@ -15,6 +15,7 @@ public class SettingsAPI
     private MethodInfo snapTurnAngleSetter;
     private MethodInfo smoothTurnSpeedSetter;
     private MethodInfo seatedModeSetter;
+    private MethodInfo interactionRaySetter;
     private MethodInfo playspaceCenterSetter;
     private MethodInfo armScaleSetter;
     private MethodInfo showCalibrateCanvasMethod;
@@ -28,6 +29,7 @@ public class SettingsAPI
         snapTurnAngleSetter = configsType.GetProperty("SnapTurnAngle", (BindingFlags)(-1)).GetSetMethod(true);
         smoothTurnSpeedSetter = configsType.GetProperty("SmoothTurnSpeed", (BindingFlags)(-1)).GetSetMethod(true);
         seatedModeSetter = configsType.GetProperty("SeatedMode", (BindingFlags)(-1)).GetSetMethod(true);
+        interactionRaySetter = configsType.GetProperty("ShowInteractionRay", (BindingFlags)(-1)).GetSetMethod(true);
         playspaceCenterSetter = configsType.GetMethod("SetShowPlayspaceCenter", (BindingFlags)(-1));
         armScaleSetter = configsType.GetProperty("ArmScale", (BindingFlags)(-1)).GetSetMethod(true);
         showCalibrateCanvasMethod = configsType.GetMethod("ShowCalibrateCanvas", (BindingFlags)(-1));
@@ -56,6 +58,7 @@ public class SettingsAPI
         snapTurnAngleSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetSliderValue("snapTurnAngle") });
         smoothTurnSpeedSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetSliderValue("smoothTurnSpeed") });
         seatedModeSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetCheckboxState("seatedMode") });
+        interactionRaySetter.Invoke(null, new object[] { ExtraSettingsAPI_GetCheckboxState("interactionRay") });
         playspaceCenterSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetComboboxSelectedIndex("playspaceCenter") });
     }
 
