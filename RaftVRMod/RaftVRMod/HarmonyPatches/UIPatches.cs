@@ -52,5 +52,34 @@ namespace RaftVR.HarmonyPatches
 
             return true;
         }
+
+        [HarmonyPatch(typeof(Storage_Small), "Open")]
+        [HarmonyPostfix]
+        static void MoveStorageToLeftSide(Storage_Small __instance, Network_Player player)
+        {
+            if (!player.IsLocalPlayer) return;
+
+            Inventory storageInventory = (Inventory)ReflectionInfos.storageInventoryRefField.GetValue(__instance);
+
+            if (storageInventory != null)
+            {
+                RectTransform inventoryRect = storageInventory.transform as RectTransform;
+
+                inventoryRect.pivot = Vector2.one;
+                Vector3 newPos = inventoryRect.localPosition;
+                newPos.x = -192;
+                inventoryRect.localPosition = newPos;
+            }
+        }
+
+        [HarmonyPatch(typeof(CraftingMenu), "OnEnable")]
+        [HarmonyPostfix]
+        static void MoveCraftingMenuToRightSide(CraftingMenu __instance)
+        {
+            RectTransform craftMenuRect = __instance.transform as RectTransform;
+            craftMenuRect.anchoredPosition = new Vector3(218, -179, 0);
+            craftMenuRect.offsetMin = new Vector2(193, -204);
+            craftMenuRect.offsetMax = new Vector2(243, -154);
+        }
     }
 }

@@ -113,6 +113,11 @@ namespace RaftVR.UI
             UpdateDialog("Do you prefer playing while standing or seated?", "Standing", "Seated", Button_Standing, Button_Seated);
         }
 
+        private void ChangeToMoveDirection()
+        {
+            UpdateDialog("What should define the forward direction when moving?", "Headset", "Controller", Button_Headset, Button_Controller);
+        }
+
         private void ChangeToFinished()
         {
             if (alreadyPatched)
@@ -127,13 +132,13 @@ namespace RaftVR.UI
 
         private void Button_Oculus()
         {
-            VRConfigs.Runtime = VRConfigs.VRRuntime.Oculus;
+            VRConfigs.WriteRuntimeToFile((int)VRConfigs.VRRuntime.Oculus);
             ChangeToTurnMethod();
         }
 
         private void Button_SteamVR()
         {
-            VRConfigs.Runtime = VRConfigs.VRRuntime.SteamVR;
+            VRConfigs.WriteRuntimeToFile((int)VRConfigs.VRRuntime.SteamVR);
             ChangeToTurnMethod();
         }
 
@@ -152,12 +157,26 @@ namespace RaftVR.UI
         private void Button_Standing()
         {
             VRConfigs.SeatedMode = false;
-            ChangeToFinished();
+            ChangeToMoveDirection();
         }
 
         private void Button_Seated()
         {
             VRConfigs.SeatedMode = true;
+            ChangeToMoveDirection();
+        }
+
+        private void Button_Headset()
+        {
+            VRConfigs.MoveDirectionOrigin = VRConfigs.DirectionOriginType.Head;
+            VRConfigs.FinishFirstSetup();
+            ChangeToFinished();
+        }
+
+        private void Button_Controller()
+        {
+            VRConfigs.MoveDirectionOrigin = VRConfigs.DirectionOriginType.Controller;
+            VRConfigs.FinishFirstSetup();
             ChangeToFinished();
         }
 

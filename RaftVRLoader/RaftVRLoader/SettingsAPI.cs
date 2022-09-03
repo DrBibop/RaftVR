@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Reflection;
 using UnityEngine;
 
-// This had to be moved in this assembly due to some issues
 public class SettingsAPI
 {
     public bool ExtraSettingsAPI_Loaded = false;
@@ -19,32 +18,45 @@ public class SettingsAPI
     private MethodInfo playspaceCenterSetter;
     private MethodInfo armScaleSetter;
     private MethodInfo showCalibrateCanvasMethod;
+    private MethodInfo runtimeGetter;
+    private MethodInfo writeRuntimeMethod;
+    private MethodInfo setDirectionOriginMethod;
+    private MethodInfo setRadialHotbarModeMethod;
+    private MethodInfo waterDistortionSetter;
 
     public SettingsAPI(Component initializerInstance, Type initializerType, Type configsType)
     {
         this.initializerInstance = initializerInstance;
 
         onLoadMethod = initializerType.GetMethod("OnSettingsAPILoaded", (BindingFlags)(-1));
-        snapTurnSetter = configsType.GetProperty("SnapTurn", (BindingFlags)(-1)).GetSetMethod(true);
-        snapTurnAngleSetter = configsType.GetProperty("SnapTurnAngle", (BindingFlags)(-1)).GetSetMethod(true);
-        smoothTurnSpeedSetter = configsType.GetProperty("SmoothTurnSpeed", (BindingFlags)(-1)).GetSetMethod(true);
-        seatedModeSetter = configsType.GetProperty("SeatedMode", (BindingFlags)(-1)).GetSetMethod(true);
-        interactionRaySetter = configsType.GetProperty("ShowInteractionRay", (BindingFlags)(-1)).GetSetMethod(true);
+        snapTurnSetter = configsType.GetProperty("SnapTurn", (BindingFlags)(-1)).GetSetMethod();
+        snapTurnAngleSetter = configsType.GetProperty("SnapTurnAngle", (BindingFlags)(-1)).GetSetMethod();
+        smoothTurnSpeedSetter = configsType.GetProperty("SmoothTurnSpeed", (BindingFlags)(-1)).GetSetMethod();
+        seatedModeSetter = configsType.GetProperty("SeatedMode", (BindingFlags)(-1)).GetSetMethod();
+        interactionRaySetter = configsType.GetProperty("ShowInteractionRay", (BindingFlags)(-1)).GetSetMethod();
         playspaceCenterSetter = configsType.GetMethod("SetShowPlayspaceCenter", (BindingFlags)(-1));
-        armScaleSetter = configsType.GetProperty("ArmScale", (BindingFlags)(-1)).GetSetMethod(true);
+        armScaleSetter = configsType.GetProperty("ArmScale", (BindingFlags)(-1)).GetSetMethod();
         showCalibrateCanvasMethod = configsType.GetMethod("ShowCalibrateCanvas", (BindingFlags)(-1));
+        runtimeGetter = configsType.GetProperty("Runtime", (BindingFlags)(-1)).GetGetMethod();
+        writeRuntimeMethod = configsType.GetMethod("WriteRuntimeToFile", (BindingFlags)(-1));
+        setDirectionOriginMethod = configsType.GetMethod("SetMoveDirectionOrigin", (BindingFlags)(-1));
+        setRadialHotbarModeMethod = configsType.GetMethod("SetRadialHotbarMode", (BindingFlags)(-1));
+        waterDistortionSetter = configsType.GetProperty("UnderwaterDistortion", (BindingFlags)(-1)).GetSetMethod();
     }
 
     public void ExtraSettingsAPI_Load()
     {
         onLoadMethod.Invoke(initializerInstance, null);
-        RefreshSettings();
+        RefreshSettings(false);
         string armScaleString = ExtraSettingsAPI_GetDataValue("hiddenSettings", "armScale");
 
         if (float.TryParse(armScaleString, NumberStyles.Any, CultureInfo.InvariantCulture, out float armScale))
-        {
             armScaleSetter.Invoke(null, new object[] { armScale });
-        }
+
+        int runtimeIndex = (int)runtimeGetter.Invoke(null, null);
+
+        if (runtimeIndex != 0)
+            ExtraSettingsAPI_SetComboboxSelectedIndex("runtime", runtimeIndex - 1);
     }
 
     public void ExtraSettingsAPI_SettingsClose()
@@ -52,7 +64,7 @@ public class SettingsAPI
         RefreshSettings();
     }
 
-    private void RefreshSettings()
+    private void RefreshSettings(bool writeRuntime = true)
     {
         snapTurnSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetCheckboxState("snapTurn") });
         snapTurnAngleSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetSliderValue("snapTurnAngle") });
@@ -60,6 +72,12 @@ public class SettingsAPI
         seatedModeSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetCheckboxState("seatedMode") });
         interactionRaySetter.Invoke(null, new object[] { ExtraSettingsAPI_GetCheckboxState("interactionRay") });
         playspaceCenterSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetComboboxSelectedIndex("playspaceCenter") });
+        setDirectionOriginMethod.Invoke(null, new object[] { ExtraSettingsAPI_GetComboboxSelectedIndex("directionOrigin") });
+        setRadialHotbarModeMethod.Invoke(null, new object[] { ExtraSettingsAPI_GetComboboxSelectedIndex("useRadialHotbar") });
+        waterDistortionSetter.Invoke(null, new object[] { ExtraSettingsAPI_GetCheckboxState("underwaterDistortion") });
+
+        if (writeRuntime)
+            writeRuntimeMethod.Invoke(null, new object[] { ExtraSettingsAPI_GetComboboxSelectedIndex("runtime") + 1 });
     }
 
     public void ExtraSettingsAPI_ButtonPress(string name)
@@ -77,6 +95,8 @@ public class SettingsAPI
     public float ExtraSettingsAPI_GetSliderValue(string SettingName) => 0;
 
     public int ExtraSettingsAPI_GetComboboxSelectedIndex(string SettingName) => 0;
+
+    public static void ExtraSettingsAPI_SetComboboxSelectedIndex(string SettingName, int value) { }
 
     public static string ExtraSettingsAPI_GetDataValue(string SettingName, string subname) => "";
 

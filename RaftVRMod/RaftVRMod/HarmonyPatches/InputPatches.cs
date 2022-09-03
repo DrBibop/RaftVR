@@ -104,40 +104,36 @@ namespace RaftVR.HarmonyPatches
         [HarmonyPostfix]
         static void EnableKeyboard(InputField __instance)
         {
-            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR)
+            VRInput.selectedInputField = __instance.gameObject;
+
+            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR && Valve.VR.SteamVR.initializedState == Valve.VR.SteamVR.InitializedStates.InitializeSuccess)
                 Valve.VR.SteamVR.instance.overlay.ShowKeyboard(0, 0, 0, __instance.name, __instance.characterLimit == 0 ? 256 : (uint)__instance.characterLimit, __instance.text, 0);
-            else
-                VRInput.SetListenForKeyboard(true);
         }
 
         [HarmonyPatch(typeof(InputField), "DeactivateInputField")]
         [HarmonyPostfix]
         static void DisableKeyboard(InputField __instance)
         {
-            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR)
+            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR && Valve.VR.SteamVR.initializedState == Valve.VR.SteamVR.InitializedStates.InitializeSuccess)
                 Valve.VR.SteamVR.instance.overlay.HideKeyboard();
-            else
-                VRInput.SetListenForKeyboard(false);
         }
 
         [HarmonyPatch(typeof(TMPro.TMP_InputField), "ActivateInputField")]
         [HarmonyPostfix]
         static void EnableKeyboardTMP(TMPro.TMP_InputField __instance)
         {
-            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR)
+            VRInput.selectedInputField = __instance.gameObject;
+
+            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR && Valve.VR.SteamVR.initializedState == Valve.VR.SteamVR.InitializedStates.InitializeSuccess)
                 Valve.VR.SteamVR.instance.overlay.ShowKeyboard(0, 0, 0, __instance.name, __instance.characterLimit == 0 ? 256 : (uint)__instance.characterLimit, __instance.text, 0);
-            else
-                VRInput.SetListenForKeyboard(true);
         }
 
         [HarmonyPatch(typeof(TMPro.TMP_InputField), "DeactivateInputField")]
         [HarmonyPostfix]
         static void DisableKeyboardTMP(TMPro.TMP_InputField __instance)
         {
-            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR)
+            if (VRConfigs.Runtime == VRConfigs.VRRuntime.SteamVR && Valve.VR.SteamVR.initializedState == Valve.VR.SteamVR.InitializedStates.InitializeSuccess)
                 Valve.VR.SteamVR.instance.overlay.HideKeyboard();
-            else
-                VRInput.SetListenForKeyboard(false);
         }
 
         [HarmonyPatch(typeof(DisplayText), "Show", typeof(string), typeof(KeyCode), typeof(int))]

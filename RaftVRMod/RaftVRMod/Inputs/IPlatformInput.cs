@@ -26,6 +26,7 @@
         bool GetNextItem();
         bool GetPreviousItem();
         bool GetPaintOneSide();
+        bool GetRadialHotbar();
         bool GetCalibrate();
         string GetBindString(string identifier);
     }

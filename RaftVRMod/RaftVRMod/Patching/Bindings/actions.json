@@ -104,6 +104,11 @@
       "requirement": "optional"
     },
     {
+      "name": "/actions/gameplay/in/radial_hotbar",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
       "name": "/actions/gameplay/out/right_haptics",
       "type": "vibration"
     },
@@ -213,7 +218,8 @@
       "/actions/gameplay/in/previous_item": "Previous Item",
       "/actions/ui/in/right_hand_click": "Click (Right Hand)",
       "/actions/ui/in/left_hand_click": "Click (Left Hand)",
-      "/actions/gameplay/out/left_haptics": "Haptics (Left Controller)"
+      "/actions/gameplay/out/left_haptics": "Haptics (Left Controller)",
+      "/actions/gameplay/in/radial_hotbar": "Radial Hotbar"
     }
   ]
 }

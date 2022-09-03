@@ -1,5 +1,6 @@
 ﻿using RaftVR.Patching;
 using RaftVR.Rig;
+using RaftVR.Utils;
 using RootMotion.FinalIK;
 using System;
 using System.IO;
@@ -9,92 +10,85 @@ namespace RaftVR.Configs
 {
     public static class VRConfigs
     {
-        private static string AppDataPath => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        private static string RaftVRDataPath => Path.Combine(AppDataPath, "RaftVR");
-        private static string RuntimeConfigPath => Path.Combine(RaftVRDataPath, "vrruntime.txt");
+        private static string GamePath => Environment.CurrentDirectory;
+        private static string RuntimeConfigPath => Path.Combine(GamePath, "VRRUNTIME.txt");
 
-        private static VRRuntime _platform = VRRuntime.None;
+        private static VRRuntime _runtime = VRRuntime.None;
         private static bool _snapTurn = false;
         private static float _turnSpeed = 90;
         private static float _turnAngle = 45;
+        private static DirectionOriginType _moveDirectionOrigin;
         private static bool _seatedMode = false;
         private static bool _isLeftHanded = false;
         private static bool _interactionRay = true;
+        private static RadialHotbarMode _useRadialHotbar = RadialHotbarMode.Always;
         private static PlayspaceCenterDisplay _playspaceCenterDisplay = PlayspaceCenterDisplay.WhenFar;
+        private static bool _underwaterDistortion = false;
         private static float _armScale = 1;
 
         internal static PlayerAnimator localPlayerAnimator;
-        internal static Action<float> refreshHiddenSettings;
+        internal static PersonController localPersonController;
         internal static GameObject calibrateCanvas;
+
+        public static event Action OnArmScaleChanged;
+        public static event Action OnFirstSetupDone;
+
+        internal static Action<float> refreshHiddenSettingsAction;
 
         public static VRRuntime Runtime
         {
-            get => _platform;
-            internal set
-            {
-                string configText;
-
-                switch(value)
-                {
-                    case VRRuntime.SteamVR:
-                        configText = "steamvr";
-                        break;
-                    case VRRuntime.Oculus:
-                        configText = "oculus";
-                        break;
-                    default:
-                        configText = "none";
-                        break;
-                }
-
-                try
-                {
-                    File.WriteAllText(RuntimeConfigPath, configText);
-                    _platform = value;
-                    Debug.Log("[RaftVR] Runtime has been set to: " + configText);
-                }
-                catch(Exception e)
-                {
-                    Debug.LogError("[RaftVR] Failed to write platform choice to file:");
-                    Debug.LogException(e);
-                }
-            }
+            get => _runtime;
+            internal set { _runtime = value; }
         }
 
         public static bool SnapTurn
         {
             get => _snapTurn;
-            internal set { _snapTurn = value; }
+            set { _snapTurn = value; }
         }
 
         public static bool IsLeftHanded
         {
             get => _isLeftHanded;
-            internal set { _isLeftHanded = value; }
+            set { _isLeftHanded = value; }
         }
 
         public static float SmoothTurnSpeed
         {
             get => _turnSpeed;
-            internal set { _turnSpeed = value; }
+            set { _turnSpeed = value; }
         }
 
         public static float SnapTurnAngle
         {
             get => _turnAngle;
-            internal set { _turnAngle = value; }
+            set { _turnAngle = value; }
+        }
+
+        public static DirectionOriginType MoveDirectionOrigin
+        {
+            get => _moveDirectionOrigin;
+            set 
+            {
+                if (_moveDirectionOrigin == value) return;
+
+                _moveDirectionOrigin = value;
+
+                if (localPersonController)
+                    ReflectionInfos.personControllerCamTransformField.SetValue(localPersonController, value == DirectionOriginType.Head ? VRRig.instance.camera.transform : VRRig.instance.LeftController.transform);
+            }
         }
 
         public static PlayspaceCenterDisplay ShowPlayspaceCenter
         {
             get => _playspaceCenterDisplay;
-            internal set { _playspaceCenterDisplay = value; }
+            set { _playspaceCenterDisplay = value; }
         }
 
         public static float ArmScale
         {
             get => _armScale;
-            internal set 
+            set 
             { 
                 _armScale = value;
                 if (localPlayerAnimator != null)
@@ -114,7 +108,7 @@ namespace RaftVR.Configs
         public static bool SeatedMode
         {
             get => _seatedMode;
-            internal set 
+            set 
             { 
                 _seatedMode = value;
                 if (!VRRig.instance) return;
@@ -126,7 +120,19 @@ namespace RaftVR.Configs
         public static bool ShowInteractionRay
         {
             get => _interactionRay;
-            internal set { _interactionRay = value; }
+            set { _interactionRay = value; }
+        }
+
+        public static RadialHotbarMode UseRadialHotbar
+        {
+            get => _useRadialHotbar;
+            set { _useRadialHotbar = value; }
+        }
+
+        public static bool UnderwaterDistortion
+        {
+            get => _underwaterDistortion;
+            set { _underwaterDistortion = value; }
         }
 
         public static void ShowCalibrateCanvas()
@@ -146,18 +152,69 @@ namespace RaftVR.Configs
             calibrateCanvas.SetActive(true);
         }
 
-        internal static void SetShowPlayspaceCenter(int enumIndex)
+        public static void SetMoveDirectionOrigin(int index)
         {
-            ShowPlayspaceCenter = (PlayspaceCenterDisplay)Mathf.Clamp(enumIndex, 0, 2);
+            MoveDirectionOrigin = (DirectionOriginType)Mathf.Clamp(index, 0, 1);
+        }
+
+        public static void SetShowPlayspaceCenter(int index)
+        {
+            ShowPlayspaceCenter = (PlayspaceCenterDisplay)Mathf.Clamp(index, 0, 2);
+        }
+
+        public static void SetRadialHotbarMode(int index)
+        {
+            UseRadialHotbar = (RadialHotbarMode)Mathf.Clamp(index, 0, 1);
         }
 
         internal static void RefreshHiddenSettings()
         {
-            if (refreshHiddenSettings != null)
-                refreshHiddenSettings.Invoke(ArmScale);
+            if (OnArmScaleChanged != null)
+                OnArmScaleChanged();
+
+            refreshHiddenSettingsAction.Invoke(ArmScale);
         }
 
-        internal static VRPatcher.PatchErrorCode RetrievePlatform()
+        internal static void FinishFirstSetup()
+        {
+            if (OnFirstSetupDone != null)
+                OnFirstSetupDone();
+        }
+
+        public static void WriteRuntimeToFile(int index)
+        {
+            VRRuntime value = (VRRuntime)index;
+
+            if (value == Runtime) return;
+
+            string configText;
+
+            switch (value)
+            {
+                case VRRuntime.SteamVR:
+                    configText = "steamvr";
+                    break;
+                case VRRuntime.Oculus:
+                    configText = "oculus";
+                    break;
+                default:
+                    configText = "none";
+                    break;
+            }
+
+            try
+            {
+                File.WriteAllText(RuntimeConfigPath, configText);
+                Debug.Log("[RaftVR] Runtime has been set to: " + configText);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[RaftVR] Failed to write platform choice to file:");
+                Debug.LogException(e);
+            }
+        }
+
+        internal static VRPatcher.PatchErrorCode RetrieveRuntime()
         {
             try
             {
@@ -172,11 +229,11 @@ namespace RaftVR.Configs
                     string platformConfig = File.ReadAllText(RuntimeConfigPath);
 
                     if (platformConfig.Contains("steamvr")) 
-                        _platform = VRRuntime.SteamVR;
+                        _runtime = VRRuntime.SteamVR;
                     else if (platformConfig.Contains("oculus")) 
-                        _platform = VRRuntime.Oculus;
+                        _runtime = VRRuntime.Oculus;
                     else 
-                        _platform = VRRuntime.None;
+                        _runtime = VRRuntime.None;
 
                     return VRPatcher.PatchErrorCode.AlreadyPatched;
                 }
@@ -199,6 +256,18 @@ namespace RaftVR.Configs
             Always,
             WhenFar,
             Never
+        }
+
+        public enum DirectionOriginType
+        {
+            Head,
+            Controller
+        }
+
+        public enum RadialHotbarMode
+        {
+            Always,
+            WhenHoldingDirection
         }
     }
 }

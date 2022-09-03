@@ -10,25 +10,41 @@ static class AssemblyManager
     {
         string appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         string raftVRDirectory = Path.Combine(appDataDirectory, "RaftVR");
-        string assetsToolsAssembly = "AssetsTools.NET.dll";
-        string modAssembly = "RaftVRMod.dll";
 
         if (!Directory.Exists(raftVRDirectory)) Directory.CreateDirectory(raftVRDirectory);
 
-        string assetsToolsTo = Path.Combine(raftVRDirectory, assetsToolsAssembly);
-        string modTo = Path.Combine(raftVRDirectory, modAssembly);
+        string[] libraryNames = new string[]
+        {
+            "RootMotion.dll",
+            "AssetsTools.NET.dll",
+            "SteamVR.dll",
+            "SteamVR_Actions.dll",
+            "RaftVRMod.dll"
+        };
+
+        modInitializerType = null;
+        Assembly modAssembly = null;
 
         Debug.Log("[RaftVR] Setting up dependencies...");
-        if (CopyDLL(assetsToolsAssembly, assetsToolsTo) && CopyDLL(modAssembly, modTo, true))
+
+        for (int i = 0; i < libraryNames.Length; i++)
         {
-            Assembly.LoadFrom(assetsToolsTo);
-            Assembly mod = Assembly.LoadFrom(modTo);
-            modInitializerType = mod.GetType("RaftVR.ModInitializer");
-            Debug.Log("[RaftVR] Dependencies ready!");
-            return true;
+            string destination = Path.Combine(raftVRDirectory, libraryNames[i]);
+            if (CopyDLL(libraryNames[i], destination, i >= 2))
+            {
+                Assembly resultingAssembly = Assembly.LoadFrom(@destination);
+
+                if (i == 4) modAssembly = resultingAssembly;
+            }
+            else
+            {
+                return false;
+            }
         }
-        modInitializerType = null;
-        return false;
+
+        modInitializerType = modAssembly.GetType("RaftVR.ModInitializer");
+        Debug.Log("[RaftVR] Dependencies ready!");
+        return true;
     }
 
     private static bool CopyDLL(string assemblyName, string to, bool replace = false)

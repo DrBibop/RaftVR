@@ -275,6 +275,11 @@ namespace RaftVR.Inputs
             return SteamVR_Actions.ui_left_hand_click.state && SteamVR_Actions.ui_right_hand_click.state;
         }
 
+        public bool GetRadialHotbar()
+        {
+            return SteamVR_Actions.gameplay_radial_hotbar.state;
+        }
+
         public class HybridButton
         {
             public bool ShortPress { get; private set; }

@@ -39,7 +39,9 @@
   <ItemGroup>
     <Compile Include="AssemblyManager.cs" />
     <Compile Include="RaftVRLoader.cs" />
+    <Compile Include="RaftVRLoader2.cs" />
     <Compile Include="SettingsAPI.cs" />
+    <Compile Include="SettingsAPI2.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -61,6 +63,9 @@
     </Reference>
     <Reference Include="Assembly-CSharp.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AssetsTools.NET">
+      <HintPath>Assemblies\AssetsTools.NET.dll</HintPath>
     </Reference>
     <Reference Include="Autodesk.Fbx.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Autodesk.Fbx.dll</HintPath>
@@ -85,6 +90,9 @@
     </Reference>
     <Reference Include="PathCreator.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\PathCreator.dll</HintPath>
+    </Reference>
+    <Reference Include="RaftVRMod">
+      <HintPath>Assemblies\RaftVRMod.dll</HintPath>
     </Reference>
     <Reference Include="Sirenix.OdinInspector.Attributes.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Sirenix.OdinInspector.Attributes.dll</HintPath>

@@ -1,4 +1,5 @@
 ﻿using RaftVR.Configs;
+using RaftVR.UI;
 using RaftVR.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -235,6 +236,8 @@ namespace RaftVR.Rig
 
         internal void UpdateWorldCanvasesPosition()
         {
+            worldCanvases.RemoveAll(x => x == null);
+
             foreach (Canvas canvas in worldCanvases)
             {
                 Vector3 pos = canvas.transform.localPosition;
@@ -253,7 +256,7 @@ namespace RaftVR.Rig
                 interactionRay.SetActive(true);
         }
 
-        internal void InitHUD()
+        internal void InitHUD(Network_Player player)
         {
             GameObject canvasesObject = GameObject.Find("Canvases");
 
@@ -273,10 +276,38 @@ namespace RaftVR.Rig
                     hotbarCanvas.transform.localPosition = new Vector3(0f, 0.05f, 0f);
                     hotbarCanvas.transform.localRotation = Quaternion.Euler(15, 20, 0);
                     hotbarCanvas.transform.localScale = Vector3.one * 0.0003f;
-                    hotbarCanvas.AddComponent<UI.HotbarController>();
+                    hotbarCanvas.AddComponent<HotbarController>();
                     hotbarCanvas.name = "Hotbar Canvas";
 
-                    UI.HotbarController.instance.Init(hotbar, uiCamera);
+                    HotbarController.instance.Init(hotbar, uiCamera);
+
+                    Transform hotslot = hotbar.Find("Hotslot parent/Slot_Hotbar");
+
+                    if (hotslot)
+                    {
+                        RadialHotbar radialHotbar = Instantiate(VRAssetsManager.radialHotbarCanvasPrefab).AddComponent<RadialHotbar>();
+                        radialHotbar.GetComponent<Canvas>().worldCamera = uiCamera;
+
+                        for(int i = 0; i < 10; i++)
+                        {
+                            GameObject hotslotInstance = Instantiate(hotslot.gameObject, radialHotbar.transform);
+                            hotslotInstance.transform.ResetTransform();
+                            (hotslotInstance.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+                            Destroy(hotslotInstance.GetComponent<Slot>());
+
+                            RadialSlot slot = hotslotInstance.AddComponent<RadialSlot>();
+                            slot.slot = player.Inventory.GetSlot(i);
+                            radialHotbar.AddSlot(slot);
+                        }
+
+                        Transform outline = Instantiate(hotbar.Find("Hotslot parent/Hotbar selection").gameObject, radialHotbar.transform).transform;
+                        outline.ResetTransform();
+                        (outline as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+
+                        radialHotbar.Init(outline, hotbar.GetComponent<Hotbar>());
+
+                        radialHotbar.gameObject.SetActive(false);
+                    }
                 }
 
                 Transform crosshair = canvasesObject.transform.Find("_CanvasGame_New/Aim");
@@ -395,6 +426,39 @@ namespace RaftVR.Rig
                     loadCircle.localPosition = new Vector3(0, 50, 0);
                 }
 
+                Transform costCursor = canvasesObject.transform.Find("_CanvasGame_New/CostCollectionCursor");
+
+                if (costCursor)
+                {
+                    costCursor.SetParent(rightHandCanvas.transform);
+
+                    costCursor.localPosition = new Vector3(0, 400, 0);
+                    costCursor.localRotation = Quaternion.identity;
+                    costCursor.localScale = Vector3.one;
+                }
+
+                Transform craftMenu = canvasesObject.transform.Find("_CanvasGame_New/Crafting");
+
+                if (craftMenu)
+                {
+                    RectTransform craftMenuRect = craftMenu as RectTransform;
+
+                    craftMenuRect.anchorMin = craftMenuRect.anchorMax = new Vector2(0.5f, 1f);
+                    craftMenuRect.anchoredPosition = new Vector3(218, -179, 0);
+                    craftMenuRect.offsetMin = new Vector2(193, -204);
+                    craftMenuRect.offsetMax = new Vector2(243, -154);
+                }
+
+                Transform researchMenu = canvasesObject.transform.Find("_CanvasGame_New/InventoryParent/Inventory_ResearchTable");
+
+                if (researchMenu)
+                {
+                    RectTransform researchMenuRect = researchMenu as RectTransform;
+
+                    researchMenuRect.pivot = Vector2.one;
+                    researchMenuRect.localPosition = new Vector3(-192, 344, 0);
+                }
+
                 canvasesObject.layer = LayerMask.NameToLayer("UI");
                 BoxCollider uiCollider = canvasesObject.AddComponent<BoxCollider>();
                 uiCollider.size = new Vector3(1920, 1080, 1);
@@ -499,7 +563,7 @@ namespace RaftVR.Rig
                 }
 
                 Vector3 playerAngles = player.eulerAngles;
-                playerAngles.y = Head.eulerAngles.y;
+                playerAngles.y = (VRConfigs.MoveDirectionOrigin == VRConfigs.DirectionOriginType.Head ? Head : LeftController.transform).eulerAngles.y;
                 player.eulerAngles = playerAngles;
             }
 

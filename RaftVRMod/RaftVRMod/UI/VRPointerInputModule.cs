@@ -107,6 +107,7 @@ namespace RaftVR.UI
             // Send enter events and update the highlight.
             var go = pointerData.pointerCurrentRaycast.gameObject;
             HandlePointerExitAndEnter(pointerData, go);
+            ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, GetBaseEventData(), ExecuteEvents.updateSelectedHandler);
         }
 
         private void HandleDrag()

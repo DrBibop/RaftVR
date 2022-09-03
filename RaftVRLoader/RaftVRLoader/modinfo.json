@@ -51,6 +51,14 @@
       }
     },
 	{
+      "type": "combobox",
+      "name": "directionOrigin",
+      "text": "Move Direction Origin",
+      "access": "both",
+      "default": "Head",
+      "values": [ "Head", "Controller" ]
+    },
+	{
       "type": "checkbox",
       "name": "seatedMode",
       "text": "Seated Mode",
@@ -66,11 +74,34 @@
     },
 	{
       "type": "combobox",
+      "name": "useRadialHotbar",
+      "text": "Use Radial Hotbar",
+      "access": "both",
+      "default": "Always",
+      "values": [ "Always", "When Holding Direction" ]
+    },
+	{
+      "type": "combobox",
       "name": "playspaceCenter",
       "text": "Show Center of Playspace",
       "access": "both",
       "default": "When Far",
       "values": [ "Always", "When Far", "Never" ]
+    },
+	{
+      "type": "checkbox",
+      "name": "underwaterDistortion",
+      "text": "Underwater Distortion Effect",
+      "access": "both",
+      "default": false
+    },
+	{
+      "type": "combobox",
+      "name": "runtime",
+      "text": "VR Runtime (Requires Restart)",
+      "access": "both",
+      "default": "SteamVR",
+      "values": [ "SteamVR", "Oculus" ]
     },
 	{
       "type": "data",

@@ -5,7 +5,6 @@ using RaftVR.Configs;
 using RaftVR.UI;
 using RaftVR.Utils;
 using RootMotion.FinalIK;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -225,7 +224,7 @@ namespace RaftVR.HarmonyPatches
             VRRig.instance.player = __instance.transform;
             VRRig.instance.positionTarget = rigTarget.transform;
 
-            VRRig.instance.InitHUD();
+            VRRig.instance.InitHUD(__instance);
             #endregion
 
             #region Setup animation clips
@@ -387,7 +386,7 @@ namespace RaftVR.HarmonyPatches
         {
             var codes = new List<CodeInstruction>(instructions);
 
-            int codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.Method(typeof(Vector3), "Normalize")));
+            int codeIndex = codes.FindIndex(x => x.Calls(AccessTools.Method(typeof(Vector3), "Normalize")));
 
             if (codeIndex != -1)
             {
@@ -448,6 +447,18 @@ namespace RaftVR.HarmonyPatches
             VRRig.instance.SetVerticalOffset(__instance.crouching ? -__instance.controller.height : 0);
         }
 
+        [HarmonyPatch(typeof(PersonController), "Start")]
+        [HarmonyPostfix]
+        static void SetMovementTransform(PersonController __instance)
+        {
+            if (!((Network_Player)ReflectionInfos.personControllerNetworkPlayerField.GetValue(__instance)).IsLocalPlayer) return;
+
+            VRConfigs.localPersonController = __instance;
+
+            if (VRConfigs.MoveDirectionOrigin == VRConfigs.DirectionOriginType.Controller)
+                ReflectionInfos.personControllerCamTransformField.SetValue(__instance, VRRig.instance.LeftController.transform);
+        }
+
         [HarmonyPatch(typeof(Player), "SetMouseLookScripts")]
         [HarmonyPostfix]
         static void SetTurnEnabled(Player __instance, bool canLook)
@@ -472,7 +483,8 @@ namespace RaftVR.HarmonyPatches
                 Player.LocalPlayerIsDead ||
                 __instance.playerNetwork.RessurectComponent.IsCarrying ||
                 !__instance.playerNetwork.PlayerItemManager.CanSwitch() ||
-                __instance.playerNetwork.BlockCreator.IsRotating)
+                __instance.playerNetwork.BlockCreator.IsRotating || 
+                VRConfigs.UseRadialHotbar == VRConfigs.RadialHotbarMode.Always)
             {
                 return;
             }
@@ -503,6 +515,7 @@ namespace RaftVR.HarmonyPatches
                 Slot newSlot = __instance.playerNetwork.Inventory.GetSlot(slotIndex);
                 __instance.SelectHotslot(newSlot);
                 HotbarController.instance.RefreshVisibility();
+                RadialHotbar.instance.SetSelectedIndex(slotIndex);
             }
         }
 

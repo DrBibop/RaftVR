@@ -172,15 +172,6 @@
   <data name="OVRPlugin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Patching\Assemblies\OVRPlugin.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="RootMotion" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Patching\Assemblies\RootMotion.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SteamVR" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Patching\Assemblies\SteamVR.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SteamVR_Actions" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Patching\Assemblies\SteamVR_Actions.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="vrassets" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\vrassets;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

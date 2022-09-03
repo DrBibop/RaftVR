@@ -146,5 +146,29 @@ namespace RaftVR.HarmonyPatches
         {
             return false;
         }
+
+        [HarmonyPatch(typeof(Firework_Hand), "Update")]
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> Firework_UseFireworkDirection(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            int codeIndex = codes.FindIndex(x => x.Calls(typeof(Network_Player).GetProperty("Camera").GetGetMethod()));
+
+            if (codeIndex != -1)
+            {
+                codeIndex--;
+
+                codes.RemoveRange(codeIndex, 2);
+
+                codeIndex++;
+
+                codes.RemoveAt(codeIndex);
+
+                codes.Insert(codeIndex, new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(Transform), "up")));
+            }
+
+            return codes;
+        }
     }
 }

@@ -81,7 +81,7 @@
     </Reference>
     <Reference Include="SteamVR, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Libs\SteamVR.dll</HintPath>
+      <HintPath>bin\Release\SteamVR.dll</HintPath>
     </Reference>
     <Reference Include="SteamVR_Actions, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -332,6 +332,8 @@
     <Compile Include="ItemComponents\TriggerReceiverTool.cs" />
     <Compile Include="ItemComponents\TwoHandedToolVR.cs" />
     <Compile Include="UI\CalibrationController.cs" />
+    <Compile Include="UI\RadialHotbar.cs" />
+    <Compile Include="UI\RadialSlot.cs" />
     <Compile Include="UI\WorldToUI.cs" />
     <Compile Include="Utils\PatchUtils.cs" />
     <Compile Include="HarmonyPatches\UIPatches.cs" />
@@ -377,16 +379,9 @@
     <EmbeddedResource Include="Patching\Bindings\binding_vive_tracker_camera.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Patching\Assemblies\RootMotion.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Patching\Assemblies\AudioPluginOculusSpatializer.dll" />
     <EmbeddedResource Include="Patching\Assemblies\openvr_api.dll" />
     <EmbeddedResource Include="Patching\Assemblies\OVRPlugin.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Patching\Assemblies\SteamVR.dll" />
-    <EmbeddedResource Include="Patching\Assemblies\SteamVR_Actions.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

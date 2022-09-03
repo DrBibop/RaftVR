@@ -21,11 +21,12 @@ namespace RaftVR
 
         public void Init(Action<float> refreshHiddenSettingsAction)
         {
+            VRConfigs.refreshHiddenSettingsAction = refreshHiddenSettingsAction;
             VRAssetsManager.Init(AssetBundle.LoadFromMemory(Properties.Resources.vrassets));
-            VRConfigs.refreshHiddenSettings = refreshHiddenSettingsAction;
+            Patch();
         }
 
-        private void OnSettingsAPILoaded()
+        public void OnSettingsAPILoaded()
         {
             VRFirstLaunchBox.apiLoaded = true;
             VRFirstLaunchBox.alreadyChoseSettings = VRConfigs.Runtime != VRConfigs.VRRuntime.None;
@@ -38,7 +39,7 @@ namespace RaftVR
                 OpenDialog();
         }
 
-        private void Start()
+        private void Patch()
         {
             instance = this;
 
@@ -46,7 +47,7 @@ namespace RaftVR
 
             if (result != VRPatcher.PatchErrorCode.Failed)
             {
-                VRPatcher.PatchErrorCode result2 = VRConfigs.RetrievePlatform();
+                VRPatcher.PatchErrorCode result2 = VRConfigs.RetrieveRuntime();
 
                 if (result2 != VRPatcher.PatchErrorCode.AlreadyPatched)
                     result = result2;

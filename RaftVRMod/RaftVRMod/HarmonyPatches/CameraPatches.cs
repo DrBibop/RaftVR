@@ -1,7 +1,10 @@
 ﻿using HarmonyLib;
+using RaftVR.Configs;
+using RaftVR.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using UltimateWater;
 using UnityEngine;
 
 namespace RaftVR.HarmonyPatches
@@ -65,6 +68,15 @@ namespace RaftVR.HarmonyPatches
 
             if (player.IsLocalPlayer)
                 return false;
+
+            return true;
+        }
+        
+        [HarmonyPatch(typeof(UnderwaterIME), "RenderDistortions")]
+        [HarmonyPrefix]
+        static bool UnderwaterIME_DisableDistortion(UnderwaterIME __instance)
+        {
+            ReflectionInfos.waterDistortionField.Invoke(GameManager.Singleton.water.Materials, new object[] { VRConfigs.UnderwaterDistortion ? 0.03f : 0f });
 
             return true;
         }

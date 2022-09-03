@@ -1,6 +1,7 @@
 ﻿using RaftVR.Configs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -21,11 +22,9 @@ namespace RaftVR.Inputs
 
         private static bool hasUpdatedThisFrame => Time.frameCount == lastUpdateFrame;
 
-        private static bool listenForKeyboard = false;
-
-        private static string[] keyCodes;
-
         internal static string lastIdentifierKeyRetrieved;
+
+        internal static GameObject selectedInputField;
 
         public static void Init(VRConfigs.VRRuntime platform)
         {
@@ -37,14 +36,6 @@ namespace RaftVR.Inputs
             else
             {
                 currentPlatformInput = new OculusInput();
-                keyCodes = new string[]
-                {
-                    "backspace","delete","tab","clear","return","pause","escape","space","[0]","[1]","[2]","[3]","[4]","[5]","[6]","[7]","[8]","[9]",
-                    "[.]","[/]","[*]","[-]","[+]","equals","enter","up","down","right","left","insert","home","end","page up","page down",
-                    "f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","f13","f14","f15","0","1","2","3","4","5","6","7","8","9",
-                    "-","=","!","@","#","$","%","^", "&","*","(",")","_","+","[","]","`","{","}","~",";","'","\\",":","\"","|",",",".","/","<",">","?",
-                    "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"
-                };
             }
 
             buttonStates = new Dictionary<string, ButtonState>()
@@ -68,7 +59,8 @@ namespace RaftVR.Inputs
                 { "PrevItem", new ButtonState(currentPlatformInput.GetPreviousItem) },
                 { "NoteBookToggle", new ButtonState(currentPlatformInput.GetNotebook) },
                 { "LeftControl", new ButtonState(currentPlatformInput.GetCrouch) },
-                { "Calibrate", new ButtonState(currentPlatformInput.GetCalibrate) }
+                { "Calibrate", new ButtonState(currentPlatformInput.GetCalibrate) },
+                { "RadialHotbar", new ButtonState(currentPlatformInput.GetRadialHotbar) }
             };
 
             axisValues = new Dictionary<string, Func<float>>()
@@ -81,9 +73,9 @@ namespace RaftVR.Inputs
 
         private static void OnKeyboardClosed(VREvent_t args)
         {
-            if (!EventSystem.current.currentSelectedGameObject) return;
+            if (!selectedInputField) return;
 
-            InputField inputField = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
+            InputField inputField = selectedInputField.GetComponent<InputField>();
 
             if (inputField)
             {
@@ -93,7 +85,7 @@ namespace RaftVR.Inputs
             }
             else
             {
-                TMP_InputField inputFieldTMP = EventSystem.current.currentSelectedGameObject.GetComponent<TMP_InputField>();
+                TMP_InputField inputFieldTMP = selectedInputField.GetComponent<TMP_InputField>();
 
                 if (inputFieldTMP)
                 {
@@ -116,39 +108,6 @@ namespace RaftVR.Inputs
             {
                 buttonState.Update();
             }
-
-            //I'm not a big fan of this method, but I have no idea why the keyboard just won't work otherwise.
-            if (listenForKeyboard)
-            {
-                if (!EventSystem.current.currentSelectedGameObject)
-                {
-                    listenForKeyboard = false;
-                    return;
-                }
-
-                InputField inputField = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
-
-                if (inputField)
-                {
-                    foreach (string code in keyCodes)
-                    {
-                        if (Input.GetKeyDown(code))
-                        {
-                            inputField.ProcessEvent(Event.KeyboardEvent(code));
-                            inputField.ForceLabelUpdate();
-                        }
-                    }
-                }
-                else
-                {
-                    listenForKeyboard = false;
-                }
-            }
-        }
-
-        public static void SetListenForKeyboard(bool listen)
-        {
-            listenForKeyboard = listen;
         }
 
         public static bool TryGetAxis(string identifier, out float value)

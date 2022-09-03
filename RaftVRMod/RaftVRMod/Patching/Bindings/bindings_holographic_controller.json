@@ -80,11 +80,11 @@
             },
             {
                "inputs" : {
-                  "north" : {
-                     "output" : "/actions/gameplay/in/crouch"
-                  },
+                "north": {
+                  "output": "/actions/gameplay/in/jump"
+                },
                   "south" : {
-                     "output" : "/actions/gameplay/in/jump"
+                     "output" : "/actions/gameplay/in/crouch"
                   }
                },
                "mode" : "dpad",

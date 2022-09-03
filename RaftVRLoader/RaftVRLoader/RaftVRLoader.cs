@@ -37,7 +37,7 @@ public class RaftVRLoader : Mod
         }
         return GetEmbeddedFileBytes(combinedString);
     }
-    
+
     public void OnModUnload()
     {
         initializerType.GetMethod("Unload").Invoke(initializer, null);

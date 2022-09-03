@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RaftVR.Configs;
+using UnityEngine;
 
 namespace RaftVR.UI
 {
@@ -12,8 +13,8 @@ namespace RaftVR.UI
         private Canvas handCanvas;
         private Transform originalParent;
         private Transform hotbar;
-
         private CanvasHelper canvasHelper;
+        private float radialButtonTimer = 0f;
 
         private void Awake()
         {
@@ -30,6 +31,27 @@ namespace RaftVR.UI
                 if (!canvasHelper) return;
             }
 
+            if (CanvasHelper.ActiveMenu != MenuType.None)
+            {
+                if (RadialHotbar.instance.gameObject.activeSelf)
+                    RadialHotbar.instance.gameObject.SetActive(false);
+            }
+            else
+            {
+                if (MyInput.GetButton("NextItem") || MyInput.GetButton("PrevItem"))
+                    radialButtonTimer += Time.deltaTime;
+                else
+                    radialButtonTimer = 0;
+
+                bool radialHotbarVisible = radialButtonTimer > (VRConfigs.UseRadialHotbar == VRConfigs.RadialHotbarMode.Always ? 0f : 0.5f) || MyInput.GetButton("RadialHotbar");
+
+                if (RadialHotbar.instance.gameObject.activeSelf != radialHotbarVisible)
+                    RadialHotbar.instance.gameObject.SetActive(radialHotbarVisible);
+
+                if (radialHotbarVisible)
+                    visibilityTimer = 0f;
+            }
+
             bool inventoryOpen = canvasHelper.GetMenu(MenuType.Inventory).IsOpen;
 
             if (inventoryOpen)
@@ -44,15 +66,15 @@ namespace RaftVR.UI
                 if (hotbar.parent != transform)
                     MoveToHand();
 
-                bool visible = visibilityTimer > 0f;
+                bool hotbarVisible = visibilityTimer > 0f  && radialButtonTimer < 0.5f;
 
-                if (visible)
+                if (hotbarVisible)
                     visibilityTimer -= Time.unscaledDeltaTime;
 
                 if (!handCanvas) return;
 
-                if (handCanvas.enabled != visible)
-                    handCanvas.enabled = visible;
+                if (handCanvas.enabled != hotbarVisible)
+                    handCanvas.enabled = hotbarVisible;
             }
         }
 

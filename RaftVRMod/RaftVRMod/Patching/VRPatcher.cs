@@ -12,7 +12,6 @@ namespace RaftVR.Patching
     {
         private static string DataPath => Application.dataPath;
         private static string PluginsPath => Path.Combine(DataPath, "Plugins");
-        private static string ManagedPath => Path.Combine(DataPath, "Managed");
         private static string SteamVRPath => Path.Combine(DataPath, "StreamingAssets", "SteamVR");
 
         public static PatchErrorCode PatchVR()
@@ -33,6 +32,8 @@ namespace RaftVR.Patching
         {
             Debug.Log("[RaftVR] Checking for VR plugins...");
 
+            PatchErrorCode result = PatchErrorCode.Failed;
+
             Dictionary<string, byte[]> plugins = new Dictionary<string, byte[]>()
             {
                 { "AudioPluginOculusSpatializer.dll", Properties.Resources.AudioPluginOculusSpatializer },
@@ -40,21 +41,9 @@ namespace RaftVR.Patching
                 { "OVRPlugin.dll", Properties.Resources.OVRPlugin }
             };
 
-            Dictionary<string, byte[]> managedLibraries = new Dictionary<string, byte[]>()
-            {
-                { "SteamVR.dll", Properties.Resources.SteamVR },
-                { "SteamVR_Actions.dll", Properties.Resources.SteamVR_Actions },
-                { "RootMotion.dll", Properties.Resources.RootMotion }
-            };
-
-            PatchErrorCode result = PatchErrorCode.Failed;
-
             try
             {
-                bool flag1 = CopyFiles(PluginsPath, plugins);
-                bool flag2 = CopyFiles(ManagedPath, managedLibraries);
-
-                if (flag1 || flag2)
+                if (CopyFiles(PluginsPath, plugins))
                 {
                     Debug.Log("[RaftVR] Successfully copied VR plugins!");
                     result = PatchErrorCode.Success;

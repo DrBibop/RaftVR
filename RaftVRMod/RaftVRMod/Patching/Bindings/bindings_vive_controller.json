@@ -56,7 +56,7 @@
               "output": "/actions/gameplay/in/turn_right"
             },
             "north": {
-              "output": "/actions/gameplay/in/next_item"
+              "output": "/actions/gameplay/in/radial_hotbar"
             },
             "south": {
               "output": "/actions/gameplay/in/crouch"

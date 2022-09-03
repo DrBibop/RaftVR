@@ -243,36 +243,6 @@ namespace RaftVR.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] RootMotion {
-            get {
-                object obj = ResourceManager.GetObject("RootMotion", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] SteamVR {
-            get {
-                object obj = ResourceManager.GetObject("SteamVR", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] SteamVR_Actions {
-            get {
-                object obj = ResourceManager.GetObject("SteamVR_Actions", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] vrassets {
             get {
                 object obj = ResourceManager.GetObject("vrassets", resourceCulture);

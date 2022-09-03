@@ -226,6 +226,12 @@ namespace RaftVR.Inputs
             return GetPrimaryAction() && GetSecondaryAction();
         }
 
+        public bool GetRadialHotbar()
+        {
+            //This will be activated when holding Next or Previous item anyway
+            return false;
+        }
+
         public class HybridButton
         {
             public bool ShortPress { get; private set; }

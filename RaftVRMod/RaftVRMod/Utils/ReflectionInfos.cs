@@ -1,68 +1,66 @@
-﻿using System;
+﻿using HarmonyLib;
 using System.Reflection;
+using UltimateWater;
 
 namespace RaftVR.Utils
 {
     static class ReflectionInfos
     {
-        internal static FieldInfo chargeMeterCurrentChargeField = GetFieldInfo(typeof(ChargeMeter), "currentCharge");
-        internal static FieldInfo chargeMeterMinChargeField = GetFieldInfo(typeof(ChargeMeter), "minCharge");
-        internal static FieldInfo chargeMeterMaxChargeField = GetFieldInfo(typeof(ChargeMeter), "maxCharge");
+        // Fields
+        internal static FieldInfo chargeMeterCurrentChargeField = AccessTools.Field(typeof(ChargeMeter), "currentCharge");
+        internal static FieldInfo chargeMeterMinChargeField = AccessTools.Field(typeof(ChargeMeter), "minCharge");
+        internal static FieldInfo chargeMeterMaxChargeField = AccessTools.Field(typeof(ChargeMeter), "maxCharge");
 
-        internal static FieldInfo displayTextPriorityField = GetFieldInfo(typeof(DisplayText), "currentPriority");
-        internal static FieldInfo displayTextButtonTextField = GetFieldInfo(typeof(DisplayText), "buttonText");
+        internal static FieldInfo displayTextPriorityField = AccessTools.Field(typeof(DisplayText), "currentPriority");
+        internal static FieldInfo displayTextButtonTextField = AccessTools.Field(typeof(DisplayText), "buttonText");
 
-        internal static FieldInfo throwableRotationField = GetFieldInfo(typeof(Throwable), "throwableStartRotation");
+        internal static FieldInfo throwableRotationField = AccessTools.Field(typeof(Throwable), "throwableStartRotation");
 
-        internal static FieldInfo animationConnectionsField = GetFieldInfo(typeof(AnimationEventCaller), "connections");
+        internal static FieldInfo animationConnectionsField = AccessTools.Field(typeof(AnimationEventCaller), "connections");
 
-        internal static FieldInfo toolOnPressUseEventField = GetFieldInfo(typeof(UsableTool), "OnPressUseButton");
-        internal static FieldInfo toolOnReleaseUseEventField = GetFieldInfo(typeof(UsableTool), "OnReleaseUseButton");
-        internal static FieldInfo toolThisItemField = GetFieldInfo(typeof(UsableTool), "thisItem");
-        internal static FieldInfo toolSetAnimationField = GetFieldInfo(typeof(UsableTool), "setItemHitAnimation");
+        internal static FieldInfo toolOnPressUseEventField = AccessTools.Field(typeof(UsableTool), "OnPressUseButton");
+        internal static FieldInfo toolOnReleaseUseEventField = AccessTools.Field(typeof(UsableTool), "OnReleaseUseButton");
+        internal static FieldInfo toolThisItemField = AccessTools.Field(typeof(UsableTool), "thisItem");
+        internal static FieldInfo toolSetAnimationField = AccessTools.Field(typeof(UsableTool), "setItemHitAnimation");
 
-        internal static FieldInfo weaponDamageField = GetFieldInfo(typeof(MeleeWeapon), "damage");
-        internal static FieldInfo weaponGoThroughInvurnabilityField = GetFieldInfo(typeof(MeleeWeapon), "goThroughInvurnability");
+        internal static FieldInfo weaponDamageField = AccessTools.Field(typeof(MeleeWeapon), "damage");
+        internal static FieldInfo weaponGoThroughInvurnabilityField = AccessTools.Field(typeof(MeleeWeapon), "goThroughInvurnability");
 
-        internal static FieldInfo usableUseAnimationField = GetFieldInfo(typeof(ItemInstance_Usable), "animationOnUse");
+        internal static FieldInfo usableUseAnimationField = AccessTools.Field(typeof(ItemInstance_Usable), "animationOnUse");
 
-        internal static FieldInfo netPickupTargetField = GetFieldInfo(typeof(SweepNet), "currentPickupTarget");
-        internal static FieldInfo netSwingEventField = GetFieldInfo(typeof(SweepNet), "eventRef_netSwing");
+        internal static FieldInfo netPickupTargetField = AccessTools.Field(typeof(SweepNet), "currentPickupTarget");
+        internal static FieldInfo netSwingEventField = AccessTools.Field(typeof(SweepNet), "eventRef_netSwing");
 
-        internal static FieldInfo itemCanChannelField = GetFieldInfo(typeof(UseableItem), "canChannel");
+        internal static FieldInfo itemCanChannelField = AccessTools.Field(typeof(UseableItem), "canChannel");
 
-        internal static FieldInfo shovelCurrentTargetField = GetFieldInfo(typeof(Shovel), "currentTarget");
+        internal static FieldInfo shovelCurrentTargetField = AccessTools.Field(typeof(Shovel), "currentTarget");
 
-        internal static FieldInfo hookGatherTimerField = GetFieldInfo(typeof(Hook), "gatherTimer");
-        internal static FieldInfo hookGatherEmitterMethod = GetFieldInfo(typeof(Hook), "eventEmitter_gather");
+        internal static FieldInfo hookGatherTimerField = AccessTools.Field(typeof(Hook), "gatherTimer");
+        internal static FieldInfo hookGatherEmitterMethod = AccessTools.Field(typeof(Hook), "eventEmitter_gather");
 
-        internal static FieldInfo optionsMenuSettingsField = GetFieldInfo(typeof(OptionsMenuBox), "settings");
+        internal static FieldInfo optionsMenuSettingsField = AccessTools.Field(typeof(OptionsMenuBox), "settings");
 
-        internal static FieldInfo personControllerNetworkPlayerField = GetFieldInfo(typeof(PersonController), "playerNetwork");
+        internal static FieldInfo personControllerNetworkPlayerField = AccessTools.Field(typeof(PersonController), "playerNetwork");
+        internal static FieldInfo personControllerCamTransformField = AccessTools.Field(typeof(PersonController), "camTransform");
 
-        internal static FieldInfo macheteQuestTagField = GetFieldInfo(typeof(Machete), "macheteInteractTagName");
+        internal static FieldInfo macheteQuestTagField = AccessTools.Field(typeof(Machete), "macheteInteractTagName");
 
-        internal static MethodInfo usableItemUse = GetMethodInfo(typeof(UseItemController), "Use");
+        internal static FieldInfo storageInventoryRefField = AccessTools.Field(typeof(Storage_Small), "inventoryReference");
 
-        internal static MethodInfo netAttemptCaptureMethod = GetMethodInfo(typeof(SweepNet), "AttemptCaptureWithNet");
-        internal static MethodInfo netPlayCatureSoundMethod = GetMethodInfo(typeof(SweepNet), "PlaySuccessfullCaptureSound");
+        // Methods
+        internal static MethodInfo usableItemUse = AccessTools.Method(typeof(UseItemController), "Use");
 
-        internal static MethodInfo shovelResetMethod = GetMethodInfo(typeof(Shovel), "ResetItemChannel");
+        internal static MethodInfo netAttemptCaptureMethod = AccessTools.Method(typeof(SweepNet), "AttemptCaptureWithNet");
+        internal static MethodInfo netPlayCatureSoundMethod = AccessTools.Method(typeof(SweepNet), "PlaySuccessfullCaptureSound");
 
-        internal static MethodInfo hookStartCollectingMethod = GetMethodInfo(typeof(Hook), "StartCollecting");
-        internal static MethodInfo hookStopCollectingMethod = GetMethodInfo(typeof(Hook), "StopCollecting");
-        internal static MethodInfo hookFinishGatheringMethod = GetMethodInfo(typeof(Hook), "FinishGathering");
+        internal static MethodInfo shovelResetMethod = AccessTools.Method(typeof(Shovel), "ResetItemChannel");
 
-        internal static MethodInfo macheteQuestInteract = GetMethodInfo(typeof(Machete), "MacheteInteractWithQuest");
+        internal static MethodInfo hookStartCollectingMethod = AccessTools.Method(typeof(Hook), "StartCollecting");
+        internal static MethodInfo hookStopCollectingMethod = AccessTools.Method(typeof(Hook), "StopCollecting");
+        internal static MethodInfo hookFinishGatheringMethod = AccessTools.Method(typeof(Hook), "FinishGathering");
 
-        private static FieldInfo GetFieldInfo(Type classType, string fieldName)
-        {
-            return classType.GetField(fieldName, (BindingFlags)(-1));
-        }
+        internal static MethodInfo macheteQuestInteract = AccessTools.Method(typeof(Machete), "MacheteInteractWithQuest");
 
-        private static MethodInfo GetMethodInfo(Type classType, string methodName, params Type[] parameterTypes)
-        {
-            return classType.GetMethod(methodName, (BindingFlags)(-1));
-        }
+        internal static MethodInfo waterDistortionField = AccessTools.PropertySetter(typeof(WaterMaterials), "UnderwaterDistortionsIntensity");
     }
 }
