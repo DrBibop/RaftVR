@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using RaftVR.Configs;
 using RaftVR.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace RaftVR.HarmonyPatches
 
         [HarmonyPatch(typeof(Throwable), "HandleLocalClient")]
         [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> Throwable_UseHandDirection(IEnumerable<CodeInstruction> instructions)
+        static IEnumerable<CodeInstruction> Throwable_UseHandDirection(IEnumerable<CodeInstruction> instructions, ILGenerator ilGen)
         {
             var codes = new List<CodeInstruction>(instructions);
 
@@ -29,27 +30,88 @@ namespace RaftVR.HarmonyPatches
 
             if (codeIndex != -1)
             {
-                codes.RemoveAt(codeIndex);
+                Label immersiveLabel = ilGen.DefineLabel();
+                Label postLabel = ilGen.DefineLabel();
 
-                codes.Insert(codeIndex, new CodeInstruction(OpCodes.Call, typeof(PatchUtils).GetMethod("SetThrowChargeToMotion", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)));
+                List<CodeInstruction> conditionCodes = new List<CodeInstruction>()
+                {
+                    new CodeInstruction(OpCodes.Call, typeof(VRConfigs).GetProperty("ImmersiveThrowing", (BindingFlags)(-1)).GetGetMethod()),
+                    new CodeInstruction(OpCodes.Brtrue_S, immersiveLabel)
+                };
+
+                List<CodeInstruction> immersiveThrowCodes = new List<CodeInstruction>()
+                {
+                    new CodeInstruction(OpCodes.Br_S, postLabel),
+                    new CodeInstruction(OpCodes.Call, typeof(PatchUtils).GetMethod("SetThrowChargeToMotion", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic))
+                };
+
+                immersiveThrowCodes[1].labels.Add(immersiveLabel);
+
+                codes[codeIndex + 1].labels.Add(postLabel);
+
+                codes.InsertRange(codeIndex + 1, immersiveThrowCodes);
+
+                codes.InsertRange(codeIndex, conditionCodes);
             }
 
             codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.PropertyGetter(typeof(Camera), "main")));
 
             if (codeIndex != -1)
             {
+                Label immersiveLabel = ilGen.DefineLabel();
+                Label postLabel = ilGen.DefineLabel();
+
+                List<CodeInstruction> conditionCodes = new List<CodeInstruction>()
+                {
+                    new CodeInstruction(OpCodes.Call, typeof(VRConfigs).GetProperty("ImmersiveThrowing", (BindingFlags)(-1)).GetGetMethod()),
+                    new CodeInstruction(OpCodes.Brtrue_S, immersiveLabel)
+                };
+
+                List<CodeInstruction> immersiveThrowCodes = new List<CodeInstruction>(PatchUtils.dominantMotionForward);
+
+                immersiveThrowCodes.Insert(0, new CodeInstruction(OpCodes.Br_S, postLabel));
+
+                immersiveThrowCodes[1].labels.Add(immersiveLabel);
+
+                codes[codeIndex + 3].labels.Add(postLabel);
+
+                codes.InsertRange(codeIndex + 3, immersiveThrowCodes);
+
                 codes.RemoveRange(codeIndex, 3);
 
-                codes.InsertRange(codeIndex, PatchUtils.dominantMotionForward);
+                codes.InsertRange(codeIndex, PatchUtils.dominantControllerForward);
+
+                codes.InsertRange(codeIndex, conditionCodes);
             }
 
             codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.PropertyGetter(typeof(Camera), "main")));
 
             if (codeIndex != -1)
             {
+                Label immersiveLabel = ilGen.DefineLabel();
+                Label postLabel = ilGen.DefineLabel();
+
+                List<CodeInstruction> conditionCodes = new List<CodeInstruction>()
+                {
+                    new CodeInstruction(OpCodes.Call, typeof(VRConfigs).GetProperty("ImmersiveThrowing", (BindingFlags)(-1)).GetGetMethod()),
+                    new CodeInstruction(OpCodes.Brtrue_S, immersiveLabel)
+                };
+
+                List<CodeInstruction> immersiveThrowCodes = new List<CodeInstruction>(PatchUtils.dominantMotionRight);
+
+                immersiveThrowCodes.Insert(0, new CodeInstruction(OpCodes.Br_S, postLabel));
+
+                immersiveThrowCodes[1].labels.Add(immersiveLabel);
+
+                codes[codeIndex + 3].labels.Add(postLabel);
+
+                codes.InsertRange(codeIndex + 3, immersiveThrowCodes);
+
                 codes.RemoveRange(codeIndex, 3);
 
-                codes.InsertRange(codeIndex, PatchUtils.dominantMotionRight);
+                codes.InsertRange(codeIndex, PatchUtils.dominantControllerRight);
+
+                codes.InsertRange(codeIndex, conditionCodes);
             }
 
             return codes.AsEnumerable();
@@ -76,7 +138,9 @@ namespace RaftVR.HarmonyPatches
             {
                 Label postLabel = ilGen.DefineLabel();
                 Label motionLabel = ilGen.DefineLabel();
+                Label normalLabel = ilGen.DefineLabel();
 
+                codes[codeIndex].labels.Add(normalLabel);
                 codes[codeIndex + 1].labels.Add(postLabel);
 
                 var newPostCodes = new List<CodeInstruction>()
@@ -89,6 +153,8 @@ namespace RaftVR.HarmonyPatches
 
                 var newPreCodes = new List<CodeInstruction>()
                 {
+                    new CodeInstruction(OpCodes.Call, typeof(VRConfigs).GetProperty("ImmersiveThrowing", (BindingFlags)(-1)).GetGetMethod()),
+                    new CodeInstruction(OpCodes.Brfalse_S, normalLabel),
                     new CodeInstruction(OpCodes.Ldarg_0),
                     new CodeInstruction(OpCodes.Isinst, typeof(ThrowableComponent_Bow)),
                     new CodeInstruction(OpCodes.Brfalse_S, motionLabel)
@@ -155,14 +221,16 @@ namespace RaftVR.HarmonyPatches
                 {
                     codeIndex -= 2;
 
-                    Label normalLabel = ilGen.DefineLabel();
+                    Label motionLabel = ilGen.DefineLabel();
                     Label postLabel = ilGen.DefineLabel();
+                    Label postLabel2 = ilGen.DefineLabel();
+                    Label immersiveLabel = ilGen.DefineLabel();
 
                     List<CodeInstruction> newCodes = new List<CodeInstruction>()
                     {
                         new CodeInstruction(OpCodes.Ldloc_1),
                         new CodeInstruction(OpCodes.Isinst, i < 2 ? typeof(ThrowableComponent_Bow) : typeof(ThrowableComponent_NetGun)),
-                        new CodeInstruction(OpCodes.Brfalse_S, normalLabel)
+                        new CodeInstruction(OpCodes.Brfalse_S, motionLabel)
                     };
 
                     // Transform direction (bow/net gun)
@@ -170,12 +238,25 @@ namespace RaftVR.HarmonyPatches
 
                     newCodes.Add(new CodeInstruction(OpCodes.Br_S, postLabel));
 
-                    // Motion direction (everything else)
-                    int normalIndex = newCodes.Count;
+                    // Motion/controller direction (everything else)
+                    int motionIndex = newCodes.Count;
+
+                    newCodes.AddRange(new List<CodeInstruction>() 
+                    {
+                        new CodeInstruction(OpCodes.Call, typeof(VRConfigs).GetProperty("ImmersiveThrowing", (BindingFlags)(-1)).GetGetMethod()),
+                        new CodeInstruction(OpCodes.Brtrue_S, immersiveLabel)
+                    });
+
+                    newCodes.AddRange(new List<CodeInstruction>(i % 2 == 0 ? PatchUtils.dominantControllerForward : PatchUtils.dominantControllerRight));
+
+                    newCodes.Add(new CodeInstruction(OpCodes.Br_S, postLabel2));
+
+                    int immersiveIndex = newCodes.Count;
 
                     newCodes.AddRange(new List<CodeInstruction>(i % 2 == 0 ? PatchUtils.dominantMotionForward : PatchUtils.dominantMotionRight));
 
-                    newCodes[normalIndex].labels.Add(normalLabel);
+                    newCodes[immersiveIndex].labels.Add(immersiveLabel);
+                    newCodes[motionIndex].labels.Add(motionLabel);
 
                     // Transfer entry point label
                     if (i % 2 == 0)
@@ -187,6 +268,7 @@ namespace RaftVR.HarmonyPatches
 
                     // Add post codes label
                     codes[codeIndex].labels.Add(postLabel);
+                    codes[codeIndex].labels.Add(postLabel2);
 
                     codes.InsertRange(codeIndex, newCodes);
                 }

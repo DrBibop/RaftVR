@@ -268,6 +268,13 @@ namespace RaftVR.Rig
                 rightHandCanvas.transform.localScale = Vector3.one * 0.0003f;
                 rightHandCanvas.name = "Right Hand Canvas";
 
+                Canvas screenEffectsCanvas = Instantiate(VRAssetsManager.handCanvasPrefab).GetComponent<Canvas>();
+                screenEffectsCanvas.transform.localScale = Vector3.one;
+                (screenEffectsCanvas.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+                screenEffectsCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+                screenEffectsCanvas.planeDistance = 0.3f;
+                screenEffectsCanvas.worldCamera = uiCamera;
+
                 Transform hotbar = canvasesObject.transform.Find("_CanvasGame_New/InventoryParent/Hotbar");
 
                 if (hotbar)
@@ -363,16 +370,12 @@ namespace RaftVR.Rig
 
                 if (screenEffects)
                 {
-                    Canvas screenEffectsCanvas = Instantiate(VRAssetsManager.handCanvasPrefab).GetComponent<Canvas>();
-
-                    screenEffectsCanvas.transform.localScale = Vector3.one;
-                    (screenEffectsCanvas.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
-                    screenEffectsCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-                    screenEffectsCanvas.planeDistance = 0.3f;
-                    screenEffectsCanvas.worldCamera = uiCamera;
-
                     screenEffects.transform.SetParent(screenEffectsCanvas.transform);
                     screenEffects.transform.ResetTransform();
+
+                    RectTransform effectsRect = screenEffects.transform as RectTransform;
+
+                    effectsRect.offsetMin = effectsRect.offsetMax = Vector2.zero;
                 }
 
                 Transform oxygenMeter = canvasesObject.transform.Find("_CanvasGame_New/OxygenMeter");
@@ -459,6 +462,39 @@ namespace RaftVR.Rig
                     researchMenuRect.localPosition = new Vector3(-192, 344, 0);
                 }
 
+                Transform sleepFadePanel = canvasesObject.transform.Find("_CanvasGame_New/Sleep fade panel");
+
+                if (sleepFadePanel)
+                {
+                    Canvas sleepFadeCanvas = Instantiate(VRAssetsManager.handCanvasPrefab).GetComponent<Canvas>();
+
+                    sleepFadeCanvas.transform.localScale = Vector3.one;
+                    (sleepFadeCanvas.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+                    sleepFadeCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+                    sleepFadeCanvas.planeDistance = 3f;
+                    sleepFadeCanvas.worldCamera = uiCamera;
+
+                    sleepFadePanel.transform.SetParent(sleepFadeCanvas.transform);
+                    sleepFadePanel.transform.ResetTransform();
+
+                    RectTransform sleepFadeRect = sleepFadePanel as RectTransform;
+                    sleepFadeRect.sizeDelta = Vector2.one * 10000;
+                }
+
+                Transform hazmatSuitOverlay = canvasesObject.transform.Find("_CanvasGame_New/HazmatSuitImage");
+
+                if (hazmatSuitOverlay)
+                {
+                    hazmatSuitOverlay.SetParent(screenEffectsCanvas.transform);
+                    hazmatSuitOverlay.ResetTransform();
+
+                    RectTransform hazmatRect = hazmatSuitOverlay.transform as RectTransform;
+
+                    hazmatRect.offsetMin = hazmatRect.offsetMax = Vector2.zero;
+
+                    hazmatSuitOverlay.GetComponent<Image>().sprite = VRAssetsManager.hazmatOverlayTexture;
+                }
+
                 canvasesObject.layer = LayerMask.NameToLayer("UI");
                 BoxCollider uiCollider = canvasesObject.AddComponent<BoxCollider>();
                 uiCollider.size = new Vector3(1920, 1080, 1);
@@ -498,6 +534,8 @@ namespace RaftVR.Rig
         private void Update()
         {
             UpdateHands();
+
+            if (uiCamera == null) return;
 
             switch (VRConfigs.ShowPlayspaceCenter)
             {

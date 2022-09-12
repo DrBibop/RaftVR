@@ -21,6 +21,8 @@ namespace RaftVR.Configs
         private static bool _seatedMode = false;
         private static bool _isLeftHanded = false;
         private static bool _interactionRay = true;
+        private static bool _immersiveThrowing = true;
+        private static float _throwForceMultiplier = 1f;
         private static RadialHotbarMode _useRadialHotbar = RadialHotbarMode.Always;
         private static PlayspaceCenterDisplay _playspaceCenterDisplay = PlayspaceCenterDisplay.WhenFar;
         private static bool _underwaterDistortion = false;
@@ -34,6 +36,7 @@ namespace RaftVR.Configs
         public static event Action OnFirstSetupDone;
 
         internal static Action<float> refreshHiddenSettingsAction;
+        internal static Action<bool, bool, int> finishFirstSetupAction;
 
         public static VRRuntime Runtime
         {
@@ -100,7 +103,7 @@ namespace RaftVR.Configs
                     solver.rightArm.armLengthMlp = value;
                 }
 
-                if (value == 0)
+                if (value == 0 && VRRig.instance)
                     ShowCalibrateCanvas();
             }
         }
@@ -121,6 +124,18 @@ namespace RaftVR.Configs
         {
             get => _interactionRay;
             set { _interactionRay = value; }
+        }
+
+        public static bool ImmersiveThrowing
+        {
+            get => _immersiveThrowing;
+            set { _immersiveThrowing = value; }
+        }
+
+        public static float ThrowForceMultiplier
+        {
+            get => _throwForceMultiplier;
+            set { _throwForceMultiplier = value; }
         }
 
         public static RadialHotbarMode UseRadialHotbar
@@ -179,6 +194,8 @@ namespace RaftVR.Configs
         {
             if (OnFirstSetupDone != null)
                 OnFirstSetupDone();
+
+            finishFirstSetupAction.Invoke(SnapTurn, SeatedMode, (int)MoveDirectionOrigin);
         }
 
         public static void WriteRuntimeToFile(int index)

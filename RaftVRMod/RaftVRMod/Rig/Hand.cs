@@ -96,15 +96,16 @@ namespace RaftVR.Rig
                 }
             }
 
-            lastPositions[2] = lastPositions[1];
-            lastPositions[1] = lastPositions[0];
-            lastPositions[0] = transform.localPosition;
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
 
-            Vector3 motion = (lastPositions[0] - lastPositions[2]) / 2;
+            if (device == null) return;
+
+            if (!device.TryGetFeatureValue(CommonUsages.deviceVelocity, out Vector3 motion)) return;
+            if (!device.TryGetFeatureValue(CommonUsages.deviceAngularVelocity, out Vector3 angular)) return;
 
             motionDirection = motion == Vector3.zero ? transform.parent.rotation : transform.parent.rotation * Quaternion.LookRotation(motion);
 
-            MotionMagnitude = motion.magnitude;
+            MotionMagnitude = motion.magnitude + angular.magnitude / 10;
         }
 
         public Vector3 GetForwardFlat()

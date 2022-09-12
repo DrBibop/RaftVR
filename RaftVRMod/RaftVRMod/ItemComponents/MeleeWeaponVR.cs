@@ -58,15 +58,15 @@ namespace RaftVR.ItemComponents
         private void OnCollisionStay(Collision collision)
         {
             if (cooldownTimer > 0 || playerNetwork.PlayerScript.IsDead) return;
-            if (weapon.attackMask == (weapon.attackMask | ( 1 << collision.gameObject.layer)))
+            if (weapon.attackMask == (weapon.attackMask | ( 1 << collision.collider.gameObject.layer)))
             {
-                Network_Entity_Redirect entityInParent = collision.gameObject.GetComponentInParent<Network_Entity_Redirect>();
+                Network_Entity_Redirect entityInParent = collision.collider.gameObject.GetComponentInParent<Network_Entity_Redirect>();
 
                 // Raft doesn't have a separate method for this, so I had to borrow from them :P
                 if (entityInParent != null)
                 {
                     Network_Entity entity = entityInParent.entity;
-                    if (entity != null)
+                    if (entity != null && !entity.IsDead)
                     {
                         weapon.OnMeleeStart();
                         if (goThroughInvurnability && entity.IsInvurnerable)
@@ -74,7 +74,7 @@ namespace RaftVR.ItemComponents
                             entity.IsInvurnerable = false;
                         }
                         cooldownTimer = cooldown;
-                        hostNetwork.DamageEntity(entity, collision.rigidbody ? collision.rigidbody.transform : collision.transform, damage, collision.contacts[0].point, collision.contacts[0].normal, EntityType.Player, null);
+                        hostNetwork.DamageEntity(entity, collision.rigidbody ? collision.rigidbody.transform : collision.collider.transform, damage, collision.contacts[0].point, collision.contacts[0].normal, EntityType.Player, null);
                         if (!entity.IsInvurnerable && entity.removesDurabilityWhenHit)
                         {
                             playerNetwork.Inventory.RemoveDurabillityFromHotSlot(1);

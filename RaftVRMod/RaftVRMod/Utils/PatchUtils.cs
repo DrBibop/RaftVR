@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using RaftVR.Configs;
 using RaftVR.Rig;
 using System.Collections.Generic;
 using System.Reflection;
@@ -65,12 +66,12 @@ namespace RaftVR.Utils
 
         internal static void SetThrowChargeToMotion(ChargeMeter meter)
         {
-            float throwSpeed = VRRig.instance.DominantController.MotionMagnitude / Time.deltaTime;
+            float throwSpeed = VRRig.instance.DominantController.MotionMagnitude * VRConfigs.ThrowForceMultiplier;
 
             float minCharge = (float)ReflectionInfos.chargeMeterMinChargeField.GetValue(meter);
             float maxCharge = (float)ReflectionInfos.chargeMeterMaxChargeField.GetValue(meter);
 
-            ReflectionInfos.chargeMeterCurrentChargeField.SetValue(meter, Mathf.Clamp((throwSpeed / 6) * maxCharge, minCharge, maxCharge));
+            ReflectionInfos.chargeMeterCurrentChargeField.SetValue(meter, Mathf.Clamp(throwSpeed / 7 * maxCharge, minCharge, maxCharge));
         }
 
         internal static Vector3 GetMetalDetectorPos(Transform transform)

@@ -50,8 +50,9 @@ namespace RaftVR.UI
             Camera camera = Camera.main;
 
             Camera uiCamera = new GameObject("UI Camera").AddComponent<Camera>();
-            uiCamera.clearFlags = CameraClearFlags.Nothing;
+            uiCamera.clearFlags = CameraClearFlags.Depth;
             uiCamera.nearClipPlane = 0.05f;
+            uiCamera.depth = 2;
 
             VRRig.instance.camera = camera;
             VRRig.instance.uiCamera = uiCamera;

@@ -19,7 +19,7 @@ public class RaftVRLoader : Mod
 
             ExtraSettingsAPI_Settings = new SettingsAPI(initializer, initializerType, initializerType.Assembly.GetType("RaftVR.Configs.VRConfigs"));
 
-            initializerType.GetMethod("Init").Invoke(initializer, new object[] { new Action<float>(ExtraSettingsAPI_Settings.RefreshHiddenSettings) });
+            initializerType.GetMethod("Init").Invoke(initializer, new object[] { new Action<float>(ExtraSettingsAPI_Settings.RefreshHiddenSettings), new Action<bool, bool, int>(ExtraSettingsAPI_Settings.FinishFirstSetup) });
         }
         else
         {

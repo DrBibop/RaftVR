@@ -35,7 +35,7 @@ namespace RaftVR.UI
 
         private void OnEnable()
         {
-            if (!hotbar) return;
+            if (!hotbar || !VRRig.instance.uiCamera) return;
 
             availableSlots.Clear();
             slotCount = 0;
@@ -68,7 +68,7 @@ namespace RaftVR.UI
             transform.position = VRRig.instance.RightController.UIHand.transform.position;
             transform.rotation = Quaternion.LookRotation(VRRig.instance.RightController.UIHand.position - VRRig.instance.uiCamera.transform.position);
 
-            selectionOutline.localPosition = selectedSlot.transform.localPosition;
+            selectionOutline.localPosition = selectedSlot ? selectedSlot.transform.localPosition : Vector3.zero;
         }
 
         private void Update()

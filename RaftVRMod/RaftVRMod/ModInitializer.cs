@@ -19,9 +19,10 @@ namespace RaftVR
         internal static ModInitializer instance;
         private bool loaded = false;
 
-        public void Init(Action<float> refreshHiddenSettingsAction)
+        public void Init(Action<float> refreshHiddenSettingsAction, Action<bool, bool, int> finishFirstSetupAction)
         {
             VRConfigs.refreshHiddenSettingsAction = refreshHiddenSettingsAction;
+            VRConfigs.finishFirstSetupAction = finishFirstSetupAction;
             VRAssetsManager.Init(AssetBundle.LoadFromMemory(Properties.Resources.vrassets));
             Patch();
         }

@@ -72,6 +72,8 @@ namespace RaftVR.UI
 
         private void CastRay()
         {
+            if (VRRig.instance.uiCamera == null && Camera.main == null) return;
+
             var isHit = Physics.Raycast(
                 VRRig.instance.DominantController.UIHand.position,
                 VRRig.instance.DominantController.UIHand.forward,

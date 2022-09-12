@@ -73,6 +73,26 @@
       "default": true
     },
 	{
+      "type": "checkbox",
+      "name": "immersiveThrow",
+      "text": "Immersive Throwing",
+      "access": "both",
+      "default": true
+    },
+	{
+      "type": "slider",
+      "name": "throwForceMultiplier",
+      "text": "Throw Force Multiplier",
+      "access": "both",
+      "default": 1,
+      "range": {
+        "type": "number",
+        "min": 1,
+        "max": 3,
+        "decimals": 2
+      }
+    },
+	{
       "type": "combobox",
       "name": "useRadialHotbar",
       "text": "Use Radial Hotbar",
