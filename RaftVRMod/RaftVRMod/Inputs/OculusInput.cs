@@ -39,7 +39,8 @@ namespace RaftVR.Inputs
             { "NextItem", "R Stick Up" },
             { "PrevItem", "R Stick Down" },
             { "NoteBookToggle", "Y" },
-            { "LeftControl", "B" }
+            { "LeftControl", "B" },
+            { "RenameAnimal", "L Grip" }
         };
 
         public void Update()

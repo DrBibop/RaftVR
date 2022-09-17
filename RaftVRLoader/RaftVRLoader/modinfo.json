@@ -2,7 +2,7 @@
   "name": "RaftVR",
   "author": "DrBibop",
   "description": "A virtual reality mod for Raft",
-  "version": "1.0",
+  "version": "1.0.0",
   "license": "GNU AGPLv3",
   "icon": "icon.png",
   "banner": "banner.jpg",
@@ -42,7 +42,7 @@
       "name": "smoothTurnSpeed",
       "text": "Smooth Turn Speed",
       "access": "both",
-      "default": 90,
+      "default": 120,
       "range": {
         "type": "number",
         "min": 45,

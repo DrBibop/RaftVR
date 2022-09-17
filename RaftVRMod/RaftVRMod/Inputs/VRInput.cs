@@ -60,7 +60,8 @@ namespace RaftVR.Inputs
                 { "NoteBookToggle", new ButtonState(currentPlatformInput.GetNotebook) },
                 { "LeftControl", new ButtonState(currentPlatformInput.GetCrouch) },
                 { "Calibrate", new ButtonState(currentPlatformInput.GetCalibrate) },
-                { "RadialHotbar", new ButtonState(currentPlatformInput.GetRadialHotbar) }
+                { "RadialHotbar", new ButtonState(currentPlatformInput.GetRadialHotbar) },
+                { "RenameAnimal", new ButtonState(currentPlatformInput.GetRotate) }
             };
 
             axisValues = new Dictionary<string, Func<float>>()

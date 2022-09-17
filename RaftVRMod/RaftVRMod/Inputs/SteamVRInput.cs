@@ -57,7 +57,8 @@ namespace RaftVR.Inputs
                 { "Remove", SteamVR_Actions.gameplay_remove },
                 { "NoteBookToggle", SteamVR_Actions.gameplay_notebook },
                 { "PaintOneSide", SteamVR_Actions.gameplay_paintoneside },
-                { "Move", SteamVR_Actions.gameplay_paintoneside }
+                { "Move", SteamVR_Actions.gameplay_paintoneside },
+                { "RenameAnimal", SteamVR_Actions.gameplay_rotate }
             };
 
             holdIdentifierBinds = new Dictionary<string, ISteamVR_Action_In_Source>()

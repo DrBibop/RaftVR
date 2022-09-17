@@ -97,7 +97,7 @@ public class SettingsAPI
         ExtraSettingsAPI_SetCheckboxState("seatedMode", seatedMode);
         ExtraSettingsAPI_SetComboboxSelectedIndex("directionOrigin", directionOrigin);
 
-        //ExtraSettingsAPI_GenerateSaveJson("");
+        ExtraSettingsAPI_SaveSettings();
     }
 
     public void ExtraSettingsAPI_ButtonPress(string name)
@@ -119,5 +119,5 @@ public class SettingsAPI
 
     public static void ExtraSettingsAPI_SetDataValue(string SettingName, string subname, string value) { }
 
-    public static void ExtraSettingsAPI_GenerateSaveJson(string path) { }
+    public static void ExtraSettingsAPI_SaveSettings() { }
 }

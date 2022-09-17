@@ -56,7 +56,7 @@
               "output": "/actions/gameplay/in/turn_right"
             },
             "north": {
-              "output": "/actions/gameplay/in/radial_hotbar"
+              "output": "/actions/gameplay/in/jump"
             },
             "south": {
               "output": "/actions/gameplay/in/crouch"
@@ -75,7 +75,7 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/gameplay/in/jump"
+              "output": "/actions/gameplay/in/radial_hotbar"
             }
           },
           "mode": "button",

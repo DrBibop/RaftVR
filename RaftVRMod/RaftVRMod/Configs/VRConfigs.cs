@@ -15,7 +15,7 @@ namespace RaftVR.Configs
 
         private static VRRuntime _runtime = VRRuntime.None;
         private static bool _snapTurn = false;
-        private static float _turnSpeed = 90;
+        private static float _turnSpeed = 120;
         private static float _turnAngle = 45;
         private static DirectionOriginType _moveDirectionOrigin;
         private static bool _seatedMode = false;
@@ -112,7 +112,7 @@ namespace RaftVR.Configs
         {
             get => _seatedMode;
             set 
-            { 
+            {
                 _seatedMode = value;
                 if (!VRRig.instance) return;
                 VRRig.instance.SetVerticalOffset(0);
