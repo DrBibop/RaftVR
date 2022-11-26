@@ -45,7 +45,7 @@ namespace RaftVR.ItemComponents
             }
         }
 
-        private void OnCollisionStay(Collision collision)
+        private void OnCollisionEnter(Collision collision)
         {
             if (cooldownTimer > 0 || PlayerItemManager.IsBusy) return;
 
