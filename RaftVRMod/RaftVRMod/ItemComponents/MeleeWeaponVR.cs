@@ -55,7 +55,7 @@ namespace RaftVR.ItemComponents
             }
         }
 
-        private void OnCollisionStay(Collision collision)
+        private void OnCollisionEnter(Collision collision)
         {
             if (cooldownTimer > 0 || playerNetwork.PlayerScript.IsDead) return;
             if (weapon.attackMask == (weapon.attackMask | ( 1 << collision.collider.gameObject.layer)))
