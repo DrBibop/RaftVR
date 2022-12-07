@@ -13,6 +13,7 @@ namespace RaftVR.ItemComponents
         float damage;
         float cooldown;
         float cooldownTimer;
+        bool disableHit;
         CanvasHelper canvas;
 
         protected virtual void Start()
@@ -35,6 +36,8 @@ namespace RaftVR.ItemComponents
             cooldown = item.settings_usable.UseButtonCooldown;
             ReflectionInfos.usableUseAnimationField.SetValue(item.settings_usable, PlayerAnimation.None);
 
+            disableHit = false;
+
             canvas = ComponentManager<CanvasHelper>.Value;
 
             // Required for collision detection to work
@@ -55,9 +58,15 @@ namespace RaftVR.ItemComponents
             }
         }
 
+        private void OnCollisionEnter(Collision collision)
+        {
+            // when we enter an object we allow hitting to occur
+            disableHit = false;
+        }
+
         private void OnCollisionStay(Collision collision)
         {
-            if (cooldownTimer > 0 || playerNetwork.PlayerScript.IsDead) return;
+            if (cooldownTimer > 0 || disableHit || playerNetwork.PlayerScript.IsDead) return;
             if (weapon.attackMask == (weapon.attackMask | ( 1 << collision.collider.gameObject.layer)))
             {
                 Network_Entity_Redirect entityInParent = collision.collider.gameObject.GetComponentInParent<Network_Entity_Redirect>();
@@ -73,7 +82,13 @@ namespace RaftVR.ItemComponents
                         {
                             entity.IsInvurnerable = false;
                         }
+
                         cooldownTimer = cooldown;
+
+                        // once we've hit we disable hitting again until we get another enter
+                        // (user has to act for multiple hits)
+                        disableHit = true;
+
                         hostNetwork.DamageEntity(entity, collision.rigidbody ? collision.rigidbody.transform : collision.collider.transform, damage, collision.contacts[0].point, collision.contacts[0].normal, EntityType.Player, null);
                         if (!entity.IsInvurnerable && entity.removesDurabilityWhenHit)
                         {

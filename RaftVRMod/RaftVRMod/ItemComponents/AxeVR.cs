@@ -10,6 +10,7 @@ namespace RaftVR.ItemComponents
         private Network_Player playerNetwork;
         private float cooldown;
         private float cooldownTimer;
+        private bool disableHit;
         private CanvasHelper canvas;
 
         private void Start()
@@ -24,6 +25,8 @@ namespace RaftVR.ItemComponents
             Item_Base item = playerNetwork.PlayerItemManager.useItemController.GetCurrentItemInHand();
 
             cooldown = item.settings_usable.UseButtonCooldown;
+
+            disableHit = false;
 
             canvas = ComponentManager<CanvasHelper>.Value;
 
@@ -45,9 +48,15 @@ namespace RaftVR.ItemComponents
             }
         }
 
+        private void OnCollisionEnter(Collision collision)
+        {
+            // when we enter an object we allow hitting to occur
+            disableHit = false;
+        }
+
         private void OnCollisionStay(Collision collision)
         {
-            if (cooldownTimer > 0 || PlayerItemManager.IsBusy) return;
+            if (cooldownTimer > 0 || disableHit || PlayerItemManager.IsBusy) return;
 
             if (collision.gameObject.tag == "Tree")
             {
@@ -62,6 +71,10 @@ namespace RaftVR.ItemComponents
             if (tree == null || tree.Depleted) return;
 
             cooldownTimer = cooldown;
+
+            // once we've hit we disable hitting again until we get another enter
+            // (user has to act for multiple hits)
+            disableHit = true;
 
             Message_AxeHit message_AxeHit = new Message_AxeHit(Messages.AxeHit, this.playerNetwork, this.playerNetwork.steamID);
             message_AxeHit.treeObjectIndex = (int)tree.PickupNetwork.ObjectIndex;
