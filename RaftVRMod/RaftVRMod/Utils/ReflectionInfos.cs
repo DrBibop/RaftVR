@@ -47,6 +47,12 @@ namespace RaftVR.Utils
 
         internal static FieldInfo storageInventoryRefField = AccessTools.Field(typeof(Storage_Small), "inventoryReference");
 
+        internal static FieldInfo characterModelPlayerNetworkField = AccessTools.Field(typeof(CharacterModelModifications), "playerNetwork");
+
+        internal static FieldInfo throwableCanThrowField = AccessTools.Field(typeof(ThrowableComponent), "canThrow");
+
+        internal static FieldInfo characterModelNetworkPlayer = AccessTools.Field(typeof(CharacterModelModifications), "playerNetwork");
+
         // Methods
         internal static MethodInfo usableItemUse = AccessTools.Method(typeof(UseItemController), "Use");
 
@@ -62,5 +68,9 @@ namespace RaftVR.Utils
         internal static MethodInfo macheteQuestInteract = AccessTools.Method(typeof(Machete), "MacheteInteractWithQuest");
 
         internal static MethodInfo waterDistortionField = AccessTools.PropertySetter(typeof(WaterMaterials), "UnderwaterDistortionsIntensity");
+
+        internal static MethodInfo throwableReleaseHandMethod = AccessTools.Method(typeof(ThrowableComponent), "ReleaseHand");
+
+        internal static MethodInfo ikSolverAnimatorSetMethod = AccessTools.PropertySetter(typeof(RootMotion.FinalIK.IKSolverVR), "animator");
     }
 }

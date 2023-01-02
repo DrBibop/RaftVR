@@ -5,7 +5,7 @@
 :: Defining the window title
 title RML Mod Build Script
 :: Copying the mod build into the loader's directory
-if exist "%~dp0..\RaftVRMod\RaftVRMod\obj\Release\RaftVRMod.dll" ( copy "%~dp0..\RaftVRMod\RaftVRMod\obj\Release\RaftVRMod.dll" "%~dp0.\RaftVRLoader\Assemblies\RaftVRMod.dll.copyonly" )
+if exist "%~dp0..\RaftVRMod\RaftVRMod\obj\Release\RaftVRMod.dll" ( copy "%~dp0..\RaftVRMod\RaftVRMod\obj\Release\RaftVRMod.dll" "%~dp0.\RaftVRLoader\Assemblies\RaftVRMod.dll" )
 :: Retrieving the current folder name
 for %%* in (.) do set foldername=%%~n*
 :: Creating a folder to contain temporary files for the build

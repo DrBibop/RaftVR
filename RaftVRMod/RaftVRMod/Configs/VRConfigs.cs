@@ -15,6 +15,7 @@ namespace RaftVR.Configs
 
         private static VRRuntime _runtime = VRRuntime.None;
         private static bool _snapTurn = false;
+        private static float _snapRepeatDelay = 0.3f;
         private static float _turnSpeed = 120;
         private static float _turnAngle = 45;
         private static DirectionOriginType _moveDirectionOrigin;
@@ -22,21 +23,26 @@ namespace RaftVR.Configs
         private static bool _isLeftHanded = false;
         private static bool _interactionRay = true;
         private static bool _immersiveThrowing = true;
+        private static bool _immersiveBow = true;
         private static float _throwForceMultiplier = 1f;
+        private static float _uiScale = 1f;
         private static RadialHotbarMode _useRadialHotbar = RadialHotbarMode.Always;
         private static PlayspaceCenterDisplay _playspaceCenterDisplay = PlayspaceCenterDisplay.WhenFar;
+        private static bool _visibleBody = false;
         private static bool _underwaterDistortion = false;
         private static float _armScale = 1;
+        private static float _legScale = 1;
 
+        internal static Network_Player localNetworkPlayer;
         internal static PlayerAnimator localPlayerAnimator;
         internal static PersonController localPersonController;
         internal static GameObject calibrateCanvas;
+        internal static Transform localBowTransform;
+        internal static Vector3 origBowPos;
+        internal static Quaternion origBowRot;
 
-        public static event Action OnArmScaleChanged;
+        public static event Action OnCalibrateSettingsUpdated;
         public static event Action OnFirstSetupDone;
-
-        internal static Action<float> refreshHiddenSettingsAction;
-        internal static Action<bool, bool, int> finishFirstSetupAction;
 
         public static VRRuntime Runtime
         {
@@ -48,6 +54,12 @@ namespace RaftVR.Configs
         {
             get => _snapTurn;
             set { _snapTurn = value; }
+        }
+
+        public static float SnapRepeatDelay
+        {
+            get => _snapRepeatDelay;
+            set { _snapRepeatDelay = value; }
         }
 
         public static bool IsLeftHanded
@@ -108,6 +120,26 @@ namespace RaftVR.Configs
             }
         }
 
+        public static float LegScale
+        {
+            get => _legScale;
+            set
+            {
+                _legScale = value;
+                if (localPlayerAnimator != null)
+                {
+                    // Have to call GetComponent so I don't have a variable of a type from an external library.
+                    // Otherwise, it freaks out on first launch when the RootMotion assembly isn't loaded.
+                    IKSolverVR solver = localPlayerAnimator.GetComponent<VRIK>().solver;
+                    solver.leftLeg.legLengthMlp = value;
+                    solver.rightLeg.legLengthMlp = value;
+                }
+
+                if (value == 0 && VRRig.instance)
+                    ShowCalibrateCanvas();
+            }
+        }
+
         public static bool SeatedMode
         {
             get => _seatedMode;
@@ -132,10 +164,57 @@ namespace RaftVR.Configs
             set { _immersiveThrowing = value; }
         }
 
+        public static bool ImmersiveBow
+        {
+            get => _immersiveBow;
+            set {
+                _immersiveBow = value;
+
+                if (localNetworkPlayer && localBowTransform)
+                {
+                    if (value)
+                    {
+                        origBowPos = localBowTransform.localPosition;
+                        origBowRot = localBowTransform.localRotation;
+
+                        localBowTransform.SetParent(localNetworkPlayer.leftHandParent);
+                        localBowTransform.localPosition = new Vector3(-0.1444f, 0.0318f, -0.0419f);
+                        localBowTransform.localEulerAngles = new Vector3(-59.188f, 179.967f, -90.68101f);
+                    }
+                    else
+                    {
+                        localBowTransform.SetParent(localNetworkPlayer.rightHandParent);
+                        localBowTransform.localPosition = origBowPos;
+                        localBowTransform.localRotation = origBowRot;
+                    }
+                }
+            }
+        }
+
         public static float ThrowForceMultiplier
         {
             get => _throwForceMultiplier;
             set { _throwForceMultiplier = value; }
+        }
+
+        public static float UIScale
+        {
+            get => _uiScale;
+            set { _uiScale = value; }
+        }
+
+        public static bool VisibleBody
+        {
+            get => _visibleBody;
+            set 
+            { 
+                _visibleBody = value;
+
+                if (localNetworkPlayer)
+                {
+                    localNetworkPlayer.currentModel.UpdateArmAndBodyMesh();
+                }
+            }
         }
 
         public static RadialHotbarMode UseRadialHotbar
@@ -164,44 +243,24 @@ namespace RaftVR.Configs
                 return;
             }
 
-            calibrateCanvas.SetActive(true);
+            if (!calibrateCanvas.activeSelf)
+                calibrateCanvas.SetActive(true);
         }
 
-        public static void SetMoveDirectionOrigin(int index)
+        internal static void RefreshCalibrateSettings()
         {
-            MoveDirectionOrigin = (DirectionOriginType)Mathf.Clamp(index, 0, 1);
-        }
-
-        public static void SetShowPlayspaceCenter(int index)
-        {
-            ShowPlayspaceCenter = (PlayspaceCenterDisplay)Mathf.Clamp(index, 0, 2);
-        }
-
-        public static void SetRadialHotbarMode(int index)
-        {
-            UseRadialHotbar = (RadialHotbarMode)Mathf.Clamp(index, 0, 1);
-        }
-
-        internal static void RefreshHiddenSettings()
-        {
-            if (OnArmScaleChanged != null)
-                OnArmScaleChanged();
-
-            refreshHiddenSettingsAction.Invoke(ArmScale);
+            if (OnCalibrateSettingsUpdated != null)
+                OnCalibrateSettingsUpdated();
         }
 
         internal static void FinishFirstSetup()
         {
             if (OnFirstSetupDone != null)
                 OnFirstSetupDone();
-
-            finishFirstSetupAction.Invoke(SnapTurn, SeatedMode, (int)MoveDirectionOrigin);
         }
 
-        public static void WriteRuntimeToFile(int index)
+        public static void WriteRuntimeToFile(VRRuntime value)
         {
-            VRRuntime value = (VRRuntime)index;
-
             if (value == Runtime) return;
 
             string configText;

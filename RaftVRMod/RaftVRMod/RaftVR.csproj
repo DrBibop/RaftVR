@@ -322,6 +322,7 @@
     <Compile Include="HarmonyPatches\PlayerPatches.cs" />
     <Compile Include="HarmonyPatches\ToolsPatches.cs" />
     <Compile Include="ItemComponents\AxeVR.cs" />
+    <Compile Include="ItemComponents\BowVR.cs" />
     <Compile Include="ItemComponents\ConsumableVR.cs" />
     <Compile Include="ItemComponents\HookVR.cs" />
     <Compile Include="ItemComponents\MeleeWeaponVR.cs" />
@@ -331,6 +332,7 @@
     <Compile Include="ItemComponents\SweepNetVR.cs" />
     <Compile Include="ItemComponents\TriggerReceiverTool.cs" />
     <Compile Include="ItemComponents\TwoHandedToolVR.cs" />
+    <Compile Include="Rig\Network_VRIK.cs" />
     <Compile Include="UI\CalibrationController.cs" />
     <Compile Include="UI\RadialHotbar.cs" />
     <Compile Include="UI\RadialSlot.cs" />
@@ -392,6 +394,7 @@
     <EmbeddedResource Include="Patching\Bindings\bindings_vive_cosmos_controller.json" />
     <EmbeddedResource Include="Patching\Bindings\actions.json" />
     <EmbeddedResource Include="Resources\vrassets" />
+    <EmbeddedResource Include="Resources\animclips" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

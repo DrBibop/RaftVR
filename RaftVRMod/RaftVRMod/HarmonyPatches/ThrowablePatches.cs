@@ -132,7 +132,39 @@ namespace RaftVR.HarmonyPatches
         {
             var codes = new List<CodeInstruction>(instructions);
 
-            int codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.Method(typeof(ChargeMeter), "Charge")));
+            int codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.Method(typeof(ThrowableComponent), "HandleReleaseButton")));
+
+            if (codeIndex != -1)
+            {
+                codeIndex -= 3;
+
+                Label skipLabel = ilGen.DefineLabel();
+
+                codes[codeIndex].labels.Add(skipLabel);
+
+                codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.Method(typeof(ThrowableComponent), "CallStartChargeEvent")));
+
+                if (codeIndex != -1)
+                {
+                    codeIndex -= 6;
+
+                    Label pullLabel = ilGen.DefineLabel();
+                    codes[codeIndex].labels.Add(pullLabel);
+
+                    var newCodes = new List<CodeInstruction>()
+                    {
+                        new CodeInstruction(OpCodes.Ldarg_0),
+                        new CodeInstruction(OpCodes.Isinst, typeof(ThrowableComponent_Bow)),
+                        new CodeInstruction(OpCodes.Brfalse, pullLabel),
+                        new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(ItemComponents.BowVR), "canPull")),
+                        new CodeInstruction(OpCodes.Brfalse, skipLabel)
+                    };
+
+                    codes.InsertRange(codeIndex, newCodes);
+                }
+            }
+
+            codeIndex = codes.FindIndex((x) => x.Calls(AccessTools.Method(typeof(ChargeMeter), "Charge")));
 
             if (codeIndex != -1)
             {

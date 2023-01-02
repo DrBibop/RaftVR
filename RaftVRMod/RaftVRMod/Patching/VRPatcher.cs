@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace RaftVR.Patching
 {
@@ -167,16 +168,25 @@ namespace RaftVR.Patching
 
         private static PatchErrorCode PatchGGM(string path)
         {
+            if (XRSettings.supportedDevices.Length == 3)
+            {
+                Debug.Log("[RaftVR] GGM patch not necessary. Supported devices count is 3 as it should be.");
+                return PatchErrorCode.AlreadyPatched;
+            }
+
             Debug.Log("[RaftVR] Patching GGM...");
 
             AssetsManager assetsManager = new AssetsManager();
 
+            Debug.Log("[RaftVR] Loading GGM from path " + path);
             AssetsFileInstance assetsFileInstance = assetsManager.LoadAssetsFile(path, false);
 
             using (MemoryStream cldbStream = new MemoryStream(Properties.Resources.cldb))
             {
                 assetsManager.LoadClassDatabase(cldbStream);
             }
+
+            Debug.Log("[RaftVR] Starting patch...");
 
             int num = 0;
             while ((long)num < (long)((ulong)assetsFileInstance.table.assetFileInfoCount))
@@ -188,8 +198,10 @@ namespace RaftVR.Patching
                     AssetTypeInstance ati = assetsManager.GetATI(assetsFileInstance.file, assetInfo, false);
                     AssetTypeValueField globalField = (ati != null) ? ati.GetBaseField(0) : null;
                     AssetTypeValueField vrDevicesField = (globalField != null) ? globalField.Get("enabledVRDevices") : null;
-                    if (vrDevicesField != null)
+                    if (vrDevicesField != null && vrDevicesField.childrenCount != -1)
                     {
+                        Debug.Log("[RaftVR] Found VR devices field! Attempting patch...");
+
                         AssetTypeValueField devicesArray = vrDevicesField.Get("Array");
 
                         if (devicesArray != null)
@@ -257,7 +269,7 @@ namespace RaftVR.Patching
                 }
                 num++;
             }
-            Debug.LogError("[RaftVR] VR enable location not found!");
+            Debug.LogError("[RaftVR] VR devices field could not be found! The GGM patch has failed. Contact DrBibop#7000 in the RaftModding or Flat2VR Discord server.");
 
             return PatchErrorCode.Failed;
         }

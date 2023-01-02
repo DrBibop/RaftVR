@@ -1,45 +1,23 @@
-﻿using UnityEngine;
-using System;
+﻿using HMLLibrary;
+using RaftVR;
 
 public class RaftVRLoader : Mod
 {
-    public static RaftVRLoader instance { get; private set; }
     public static SettingsAPI ExtraSettingsAPI_Settings;
 
-    private Component initializer;
-    private Type initializerType;
+    private ModInitializer initializer;
 
     public void Start()
     {
-        instance = this;
+        initializer = gameObject.AddComponent<ModInitializer>();
 
-        if (AssemblyManager.CopyDependencies(out initializerType))
-        {
-            initializer = gameObject.AddComponent(initializerType);
+        ExtraSettingsAPI_Settings = new SettingsAPI(initializer);
 
-            ExtraSettingsAPI_Settings = new SettingsAPI(initializer, initializerType, initializerType.Assembly.GetType("RaftVR.Configs.VRConfigs"));
-
-            initializerType.GetMethod("Init").Invoke(initializer, new object[] { new Action<float>(ExtraSettingsAPI_Settings.RefreshHiddenSettings), new Action<bool, bool, int>(ExtraSettingsAPI_Settings.FinishFirstSetup) });
-        }
-        else
-        {
-            Debug.LogError("[RaftVR] Failed to copy dependency assemblies. RaftVR will not load.");
-            return;
-        }
-    }
-
-    public byte[] GetEmbeddedFileCombinedPath(params string[] paths)
-    {
-        string combinedString = paths[0];
-        for (int i = 1; i < paths.Length; i++)
-        {
-            combinedString += "/" + paths[i];
-        }
-        return GetEmbeddedFileBytes(combinedString);
+        initializer.Init();
     }
 
     public void OnModUnload()
     {
-        initializerType.GetMethod("Unload").Invoke(initializer, null);
+        initializer.Unload();
     }
 }

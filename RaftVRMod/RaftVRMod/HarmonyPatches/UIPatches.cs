@@ -57,7 +57,7 @@ namespace RaftVR.HarmonyPatches
         [HarmonyPostfix]
         static void MoveStorageToLeftSide(Storage_Small __instance, Network_Player player)
         {
-            if (!player.IsLocalPlayer) return;
+            if (player == null || !player.IsLocalPlayer) return;
 
             Inventory storageInventory = (Inventory)ReflectionInfos.storageInventoryRefField.GetValue(__instance);
 

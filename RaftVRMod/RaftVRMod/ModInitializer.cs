@@ -19,11 +19,9 @@ namespace RaftVR
         internal static ModInitializer instance;
         private bool loaded = false;
 
-        public void Init(Action<float> refreshHiddenSettingsAction, Action<bool, bool, int> finishFirstSetupAction)
+        public void Init()
         {
-            VRConfigs.refreshHiddenSettingsAction = refreshHiddenSettingsAction;
-            VRConfigs.finishFirstSetupAction = finishFirstSetupAction;
-            VRAssetsManager.Init(AssetBundle.LoadFromMemory(Properties.Resources.vrassets));
+            VRAssetsManager.Init(AssetBundle.LoadFromMemory(Properties.Resources.vrassets), AssetBundle.LoadFromMemory(Properties.Resources.animclips));
             Patch();
         }
 
@@ -48,11 +46,23 @@ namespace RaftVR
 
             if (result != VRPatcher.PatchErrorCode.Failed)
             {
-                VRPatcher.PatchErrorCode result2 = VRConfigs.RetrieveRuntime();
-
-                if (result2 != VRPatcher.PatchErrorCode.AlreadyPatched)
-                    result = result2;
+                PostPatch(result);
             }
+            else
+            {
+                VRFirstLaunchBox.errored = true;
+                OpenDialog();
+            }
+        }
+
+        private void PostPatch(VRPatcher.PatchErrorCode firstResult)
+        {
+            VRPatcher.PatchErrorCode result = firstResult;
+
+            VRPatcher.PatchErrorCode result2 = VRConfigs.RetrieveRuntime();
+
+            if (result2 == VRPatcher.PatchErrorCode.Success)
+                result = result2;
 
             switch (result)
             {

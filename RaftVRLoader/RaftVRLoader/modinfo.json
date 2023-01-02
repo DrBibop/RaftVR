@@ -2,7 +2,7 @@
   "name": "RaftVR",
   "author": "DrBibop",
   "description": "A virtual reality mod for Raft",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "GNU AGPLv3",
   "icon": "icon.png",
   "banner": "banner.jpg",
@@ -35,6 +35,19 @@
         "min": 30,
         "max": 180,
         "decimals": 0
+      }
+    },
+	{
+      "type": "slider",
+      "name": "snapRepeatDelay",
+      "text": "Snap Repeat Delay",
+      "access": "both",
+      "default": 0.3,
+      "range": {
+        "type": "number",
+        "min": 0.1,
+        "max": 1.0,
+        "decimals": 1
       }
     },
 	{
@@ -80,6 +93,13 @@
       "default": true
     },
 	{
+      "type": "checkbox",
+      "name": "immersiveBow",
+      "text": "Immersive Bow",
+      "access": "both",
+      "default": true
+    },
+	{
       "type": "slider",
       "name": "throwForceMultiplier",
       "text": "Throw Force Multiplier",
@@ -90,6 +110,19 @@
         "min": 1,
         "max": 3,
         "decimals": 2
+      }
+    },
+	{
+      "type": "slider",
+      "name": "uiScale",
+      "text": "UI Scale",
+      "access": "both",
+      "default": 1,
+      "range": {
+        "type": "number",
+        "min": 0.5,
+        "max": 2,
+        "decimals": 1
       }
     },
 	{
@@ -107,6 +140,13 @@
       "access": "both",
       "default": "When Far",
       "values": [ "Always", "When Far", "Never" ]
+    },
+	{
+      "type": "checkbox",
+      "name": "visibleBody",
+      "text": "Show Body",
+      "access": "both",
+      "default": true
     },
 	{
       "type": "checkbox",
@@ -128,7 +168,8 @@
       "name": "hiddenSettings",
       "access": "both",
       "default": {
-		"armScale": "0.0"
+		"armScale": "0.0",
+		"legScale": "0.0"
       }
     }
   ]

@@ -73,6 +73,16 @@ namespace RaftVR.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] animclips {
+            get {
+                object obj = ResourceManager.GetObject("animclips", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] AudioPluginOculusSpatializer {
             get {
                 object obj = ResourceManager.GetObject("AudioPluginOculusSpatializer", resourceCulture);

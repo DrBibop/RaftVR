@@ -10,6 +10,8 @@ namespace RaftVR.UI
     {
         private const float CHARACTER_ARM_LENGTH = 0.433f;
         private const float CHARACTER_SHOULDERS_WIDTH = 0.5f;
+        private const float CHARACTER_UPPER_BODY_LENGTH = 0.71f;
+        private const float CHARACTER_LEG_LENGTH = 0.85f;
 
         private void Update()
         {
@@ -18,7 +20,12 @@ namespace RaftVR.UI
                 float playerWingspan = Vector3.Distance(VRRig.instance.RightHandIKTarget.position, VRRig.instance.LeftHandIKTarget.position);
                 float playerArmLength = (playerWingspan - CHARACTER_SHOULDERS_WIDTH) / 2;
                 VRConfigs.ArmScale = playerArmLength / CHARACTER_ARM_LENGTH;
-                VRConfigs.RefreshHiddenSettings();
+
+                float playerEyeLevel = VRRig.instance.Head.transform.localPosition.y;
+                float playerLegLength = playerEyeLevel - CHARACTER_UPPER_BODY_LENGTH;
+                VRConfigs.LegScale = playerLegLength / CHARACTER_LEG_LENGTH;
+
+                VRConfigs.RefreshCalibrateSettings();
 
                 Recenter();
 

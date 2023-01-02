@@ -4,7 +4,6 @@
   <PropertyGroup>
     <LangVersion>7.3</LangVersion>
     <ProjectGuid>{41D2BDD7-E52C-4470-AC81-5F4B496CC559}</ProjectGuid>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,8 +11,8 @@
     <ProjectGuid>{41D2BDD7-E52C-4470-AC81-5F4B496CC559}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RaftVR</RootNamespace>
-    <AssemblyName>RaftVR</AssemblyName>
+    <RootNamespace>RaftNonVR</RootNamespace>
+    <AssemblyName>RaftNonVR</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -37,30 +36,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="RaftVRLoader.cs" />
-    <Compile Include="SettingsAPI.cs" />
+    <Compile Include="HarmonyPatches.cs" />
+    <Compile Include="Network_VRIK.cs" />
+    <Compile Include="RaftNonVR.cs" />
+    <Compile Include="Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assemblies\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="modinfo.json" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.2.0\lib\net45\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp-firstpass.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="AssetsTools.NET">
-      <HintPath>Assemblies\AssetsTools.NET.dll</HintPath>
     </Reference>
     <Reference Include="Autodesk.Fbx.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Autodesk.Fbx.dll</HintPath>
@@ -86,15 +79,29 @@
     <Reference Include="PathCreator.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\PathCreator.dll</HintPath>
     </Reference>
-    <Reference Include="RaftVRMod, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Assemblies\RaftVRMod.dll</HintPath>
+    <Reference Include="RootMotion">
+      <HintPath>.\RootMotion.dll</HintPath>
     </Reference>
     <Reference Include="Sirenix.OdinInspector.Attributes.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Sirenix.OdinInspector.Attributes.dll</HintPath>
     </Reference>
+    <Reference Include="Sirenix.OdinInspector.CompatibilityLayer.dll">
+      <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Sirenix.OdinInspector.CompatibilityLayer.dll</HintPath>
+    </Reference>
+    <Reference Include="Sirenix.Serialization.Config.dll">
+      <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Sirenix.Serialization.Config.dll</HintPath>
+    </Reference>
+    <Reference Include="Sirenix.Serialization.dll">
+      <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Sirenix.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="Sirenix.Utilities.dll">
+      <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\Sirenix.Utilities.dll</HintPath>
+    </Reference>
     <Reference Include="System.Configuration.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\System.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core.dll">
+      <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\System.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\System.dll</HintPath>
@@ -324,11 +331,29 @@
     <Reference Include="UnityEngine.XRModule.dll">
       <HintPath>F:\SteamLibrary\steamapps\common\Raft\Raft_Data/Managed\UnityEngine.XRModule.dll</HintPath>
     </Reference>
+    <Reference Include="0Harmony.dll">
+      <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="coremod.dll">
       <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\coremod.dll</HintPath>
     </Reference>
     <Reference Include="HMLCoreLibrary.dll">
       <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\HMLCoreLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.dll">
+      <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="RTCP.dll">
+      <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\RTCP.dll</HintPath>
+    </Reference>
+    <Reference Include="RTCPNetImprovements.dll">
+      <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\RTCPNetImprovements.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpZipLib.dll">
+      <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple.dll">
+      <HintPath>C:\Users\olipo\AppData\Roaming\RaftModLoader\binaries\System.ValueTuple.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup>
@@ -337,10 +362,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>call cd $(SolutionDir)
-call build.bat "F:\SteamLibrary\steamapps\common\Raft\mods"
+call build.bat &gt;NUL
 echo 🔰 =============== 🔰 MOD BUILD SCRIPT 🔰 =============== 🔰
-echo ✔️ Mod successfully built! ✔️
+echo ✔️ Mod successfully built as $(SolutionDir)$(ProjectName).rmod ✔️
 echo ===========================================================
-</PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

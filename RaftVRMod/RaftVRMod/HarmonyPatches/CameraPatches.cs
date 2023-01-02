@@ -22,22 +22,15 @@ namespace RaftVR.HarmonyPatches
         }
 
         [HarmonyPatch(typeof(CharacterModelModifications), "Update")]
-        [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> CharacterModelModifications_ReplaceFOVCamera(IEnumerable<CodeInstruction> instructions, ILGenerator iLGenerator)
+        [HarmonyPrefix]
+        static bool CharacterModelModifications_RemoveFOVChanges(CharacterModelModifications __instance)
         {
-            var codes = new List<CodeInstruction>(instructions);
+            if (ReflectionInfos.characterModelPlayerNetworkField.GetValue(__instance) == null)
+            {
+                ReflectionInfos.characterModelPlayerNetworkField.SetValue(__instance, __instance.GetComponentInParent<Network_Player>());
+            }
 
-            int labelIndex = codes.FindIndex(x => x.LoadsField(AccessTools.Field(typeof(CharacterModelModifications), "settings"))) - 1;
-            int branchIndex = codes.FindIndex(x => x.opcode == OpCodes.Brfalse_S && codes[labelIndex].labels.Contains((Label)x.operand));
-
-            int newLabelIndex = codes.FindLastIndex(x => x.Calls(AccessTools.PropertySetter(typeof(Camera), "fieldOfView"))) + 1;
-            int branch2Index = codes.FindIndex(x => x.opcode == OpCodes.Brfalse && codes[newLabelIndex].labels.Contains((Label)x.operand));
-
-            codes[branchIndex].operand = codes[branch2Index].operand;
-
-            codes.RemoveRange(labelIndex, 54);
-
-            return codes.AsEnumerable();
+            return false;
         }
 
         [HarmonyPatch(typeof(Helper), "OnWorldRecievedLate")]

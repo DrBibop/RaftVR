@@ -5,6 +5,7 @@ namespace RaftVR
     internal static class VRAssetsManager
     {
         private static AssetBundle vrassets;
+        private static AssetBundle animclips;
 
         internal static AnimationClip[] vrClips;
         internal static Material lineMaterial;
@@ -15,10 +16,11 @@ namespace RaftVR
         internal static GameObject radialHotbarCanvasPrefab;
         internal static Sprite hazmatOverlayTexture;
 
-        internal static void Init(AssetBundle vrAssetsBundle)
+        internal static void Init(AssetBundle vrAssetsBundle, AssetBundle animclipsBundle)
         {
             vrassets = vrAssetsBundle;
-            vrClips = vrAssetsBundle.LoadAllAssets<AnimationClip>();
+            animclips = animclipsBundle;
+            vrClips = animclipsBundle.LoadAllAssets<AnimationClip>();
             lineMaterial = vrAssetsBundle.LoadAsset<Material>("Line");
             handCanvasPrefab = vrAssetsBundle.LoadAsset<GameObject>("HandCanvas");
             playspaceCenterIndicatorPrefab = vrAssetsBundle.LoadAsset<GameObject>("PlayspaceCenterIndicator");
@@ -31,6 +33,7 @@ namespace RaftVR
         internal static void Unload()
         {
             vrassets.Unload(true);
+            animclips.Unload(true);
         }
     }
 }

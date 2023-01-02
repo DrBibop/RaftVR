@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using RaftVR.Configs;
 using RaftVR.Rig;
 using RaftVR.Utils;
 using System.Collections.Generic;
@@ -64,7 +63,7 @@ namespace RaftVR.HarmonyPatches
         //The raycast started from the camera before. Now that the hand provides way more reach, let's reduce the ray distance to compensate.
         static bool FindInteractable_NerfRange(ref float interactDistance)
         {
-            interactDistance /= 2;
+            interactDistance /= 1.8f;
             return true;
         }
 
@@ -192,7 +191,7 @@ namespace RaftVR.HarmonyPatches
         //The raycast started from the camera before. Now that the hand provides way more reach, let's reduce the ray distance to compensate.
         static bool NerfRange(ref float rayDistance)
         {
-            rayDistance /= 2;
+            rayDistance /= 1.8f;
             return true;
         }
 

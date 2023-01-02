@@ -18,6 +18,8 @@ namespace RaftVR.Rig
 
         private bool canSnapTurn = true;
 
+        private float snapRepeatTimer = 0f;
+
         public Camera camera {
             get => _camera;
             set
@@ -73,7 +75,16 @@ namespace RaftVR.Rig
             }
         }
 
-        public Transform player { get; set; }
+        private Network_Player _player;
+
+        public Network_Player player 
+        {
+            get => _player;
+            set
+            {
+                _player = value;
+            }
+        }
 
         private Transform _positionTarget;
         public Transform positionTarget {
@@ -97,6 +108,17 @@ namespace RaftVR.Rig
         public Transform HeadIKTarget { get; private set; }
         public Transform LeftHandIKTarget { get; private set; }
         public Transform RightHandIKTarget { get; private set; }
+
+        public Transform DominantHandIKTarget => VRConfigs.IsLeftHanded ? LeftHandIKTarget : RightHandIKTarget;
+        public Transform NonDominantHandIKTarget => VRConfigs.IsLeftHanded ? RightHandIKTarget : LeftHandIKTarget;
+
+        public Transform LeftHandPlayerBone { get; internal set; }
+        public Transform RightHandPlayerBone { get; internal set; }
+
+        public Transform DominantHandPlayerBone => VRConfigs.IsLeftHanded ? LeftHandPlayerBone : RightHandPlayerBone;
+        public Transform NonDominantHandPlayerBone => VRConfigs.IsLeftHanded ? RightHandPlayerBone : LeftHandPlayerBone;
+
+        internal Transform nonDominantCanvasHolder;
 
         private GameObject playspaceCenterIndicator;
 
@@ -214,7 +236,9 @@ namespace RaftVR.Rig
             canvas.transform.SetParent(null);
             canvas.transform.localPosition = fixedRotation * new Vector3(0, VRConfigs.SeatedMode ? 1.2f : 1.6f, 1);
             canvas.transform.localRotation = fixedRotation;
-            canvas.transform.localScale = Vector3.one * 0.0006f;
+            canvas.transform.localScale = Vector3.one * 0.0006f * VRConfigs.UIScale;
+
+            UIHelper.AddScalableUIElement(canvas.transform, Vector3.one * 0.0006f);
         }
 
         private void MoveCanvasToWorld(Canvas canvas, bool addCollider)
@@ -265,8 +289,10 @@ namespace RaftVR.Rig
                 GameObject rightHandCanvas = Instantiate(VRAssetsManager.handCanvasPrefab, DominantController.UIWorldHand);
                 rightHandCanvas.transform.localPosition = new Vector3(0f, 0.05f, 0f);
                 rightHandCanvas.transform.localRotation = Quaternion.Euler(15, 20, 0);
-                rightHandCanvas.transform.localScale = Vector3.one * 0.0003f;
+                rightHandCanvas.transform.localScale = Vector3.one * 0.0003f * VRConfigs.UIScale;
                 rightHandCanvas.name = "Right Hand Canvas";
+
+                UIHelper.AddScalableUIElement(rightHandCanvas.transform, Vector3.one * 0.0003f);
 
                 Canvas screenEffectsCanvas = Instantiate(VRAssetsManager.handCanvasPrefab).GetComponent<Canvas>();
                 screenEffectsCanvas.transform.localScale = Vector3.one;
@@ -282,9 +308,11 @@ namespace RaftVR.Rig
                     GameObject hotbarCanvas = Instantiate(VRAssetsManager.handCanvasPrefab, DominantController.UIWorldHand);
                     hotbarCanvas.transform.localPosition = new Vector3(0f, 0.05f, 0f);
                     hotbarCanvas.transform.localRotation = Quaternion.Euler(15, 20, 0);
-                    hotbarCanvas.transform.localScale = Vector3.one * 0.0003f;
+                    hotbarCanvas.transform.localScale = Vector3.one * 0.0003f * VRConfigs.UIScale;
                     hotbarCanvas.AddComponent<HotbarController>();
                     hotbarCanvas.name = "Hotbar Canvas";
+
+                    UIHelper.AddScalableUIElement(hotbarCanvas.transform, Vector3.one * 0.0003f);
 
                     HotbarController.instance.Init(hotbar, uiCamera);
 
@@ -299,8 +327,11 @@ namespace RaftVR.Rig
                         {
                             GameObject hotslotInstance = Instantiate(hotslot.gameObject, radialHotbar.transform);
                             hotslotInstance.transform.ResetTransform();
+                            hotslotInstance.transform.localScale = Vector3.one * VRConfigs.UIScale;
                             (hotslotInstance.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
                             Destroy(hotslotInstance.GetComponent<Slot>());
+
+                            UIHelper.AddScalableUIElement(hotslotInstance.transform, Vector3.one);
 
                             RadialSlot slot = hotslotInstance.AddComponent<RadialSlot>();
                             slot.slot = player.Inventory.GetSlot(i);
@@ -309,7 +340,10 @@ namespace RaftVR.Rig
 
                         Transform outline = Instantiate(hotbar.Find("Hotslot parent/Hotbar selection").gameObject, radialHotbar.transform).transform;
                         outline.ResetTransform();
+                        outline.localScale = Vector3.one * VRConfigs.UIScale;
                         (outline as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+
+                        UIHelper.AddScalableUIElement(outline, Vector3.one);
 
                         radialHotbar.Init(outline, hotbar.GetComponent<Hotbar>());
 
@@ -391,14 +425,19 @@ namespace RaftVR.Rig
                     cameraCanvas.transform.ResetTransform();
                     oxygenMeter.SetParent(cameraCanvas.transform);
                     oxygenMeter.ResetTransform();
+                    oxygenMeter.localScale = Vector3.one * VRConfigs.UIScale;
                     (oxygenMeter as RectTransform).anchoredPosition = Vector2.zero;
 
                     notificationManager.SetParent(cameraCanvas.transform);
-                    notificationManager.ResetTransform();
+                    notificationManager.localPosition = Vector3.up * -700;
+                    notificationManager.localScale = Vector3.one * VRConfigs.UIScale;
+
+                    UIHelper.AddScalableUIElement(oxygenMeter, Vector3.one);
+                    UIHelper.AddScalableUIElement(notificationManager, Vector3.one);
 
                     foreach (Transform child in notificationManager)
                     {
-                        child.transform.localPosition = new Vector3(390, -700, 0);
+                        child.transform.localPosition = Vector3.right * 390;
                     }
 
                     saveIcon.SetParent(cameraCanvas.transform);
@@ -497,8 +536,8 @@ namespace RaftVR.Rig
 
                 canvasesObject.layer = LayerMask.NameToLayer("UI");
                 BoxCollider uiCollider = canvasesObject.AddComponent<BoxCollider>();
-                uiCollider.size = new Vector3(1920, 1080, 1);
-                uiCollider.center = Vector3.zero;
+                uiCollider.size = new Vector3(3000, 1080, 1);
+                uiCollider.center = Vector3.right * 500;
 
                 Canvas[] canvases = canvasesObject.GetComponentsInChildren<Canvas>();
 
@@ -513,9 +552,12 @@ namespace RaftVR.Rig
                 }
 
                 canvasesObject.transform.SetParent(NonDominantController.UIWorldHand);
-                canvasesObject.transform.localPosition = new Vector3(0, 0.2f, 0.1f);
+                canvasesObject.transform.localPosition = new Vector3(0, 0.2f, 0.1f) * VRConfigs.UIScale;
                 canvasesObject.transform.localRotation = Quaternion.Euler(15, -20, 0);
-                canvasesObject.transform.localScale = Vector3.one * 0.0003f;
+                canvasesObject.transform.localScale = Vector3.one * 0.0003f * VRConfigs.UIScale;
+
+                nonDominantCanvasHolder = canvasesObject.transform;
+                UIHelper.AddScalableUIElement(nonDominantCanvasHolder, Vector3.one * 0.0003f);
             }
         }
 
@@ -585,6 +627,14 @@ namespace RaftVR.Rig
                             {
                                 rigAngles.y += Mathf.Sign(turnAxis) * VRConfigs.SnapTurnAngle;
                                 canSnapTurn = false;
+                                snapRepeatTimer = VRConfigs.SnapRepeatDelay;
+                            }
+                            else
+                            {
+                                snapRepeatTimer -= Time.unscaledDeltaTime;
+
+                                if (snapRepeatTimer <= 0)
+                                    canSnapTurn = true;
                             }
                         }
                         else
@@ -600,9 +650,9 @@ namespace RaftVR.Rig
                     }
                 }
 
-                Vector3 playerAngles = player.eulerAngles;
-                playerAngles.y = (VRConfigs.MoveDirectionOrigin == VRConfigs.DirectionOriginType.Head ? Head : LeftController.transform).eulerAngles.y;
-                player.eulerAngles = playerAngles;
+                Vector3 playerAngles = player.transform.eulerAngles;
+                playerAngles.y = Quaternion.LookRotation(Vector3.Cross(Head.right, Vector3.up), Vector3.up).eulerAngles.y;
+                player.transform.eulerAngles = playerAngles;
             }
 
             if (cameraHolder)

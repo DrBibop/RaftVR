@@ -1,4 +1,5 @@
 ﻿using RaftVR.Configs;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -19,6 +20,7 @@ namespace RaftVR.UI
         internal static bool alreadyPatched = false;
         internal static bool apiLoaded = false;
         internal static bool alreadyChoseSettings = false;
+        internal static bool errored = false;
 
         private void Awake()
         {
@@ -62,6 +64,12 @@ namespace RaftVR.UI
 
         internal void StartDialog()
         {
+            if (errored)
+            {
+                ShowErrorMessage();
+                return;
+            }
+
             if (alreadyChoseSettings)
             {
                 ChangeToFinished();
@@ -93,6 +101,11 @@ namespace RaftVR.UI
         {
             UpdateDialog(message, buttonText, buttonText, buttonAction, buttonAction, false);
             button1.gameObject.SetActive(false);
+        }
+
+        internal void ShowErrorMessage()
+        {
+            UpdateDialogSingleOption("A RaftVR error occured. Contact DrBibop on the RaftModding or Flat2VR Discord server.", "Okay", Button_Later);
         }
 
         internal void StartFirstTimeSetup()
@@ -132,13 +145,13 @@ namespace RaftVR.UI
 
         private void Button_Oculus()
         {
-            VRConfigs.WriteRuntimeToFile((int)VRConfigs.VRRuntime.Oculus);
+            VRConfigs.WriteRuntimeToFile(VRConfigs.VRRuntime.Oculus);
             ChangeToTurnMethod();
         }
 
         private void Button_SteamVR()
         {
-            VRConfigs.WriteRuntimeToFile((int)VRConfigs.VRRuntime.SteamVR);
+            VRConfigs.WriteRuntimeToFile(VRConfigs.VRRuntime.SteamVR);
             ChangeToTurnMethod();
         }
 

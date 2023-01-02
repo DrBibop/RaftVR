@@ -258,14 +258,14 @@ namespace RaftVR.Inputs
                 {
                     holdTime += Time.deltaTime;
 
-                    if (holdTime > 0.5f)
+                    if (holdTime > 0.65f)
                     {
                         LongPress = true;
                     }
                 }
                 else
                 {
-                    if (holdTime > 0f && holdTime <= 0.5f)
+                    if (holdTime > 0f && holdTime <= 0.65f)
                     {
                         ShortPress = true;
                     }
