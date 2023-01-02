@@ -75,7 +75,7 @@ namespace RaftVR.ItemComponents
                 if (entityInParent != null)
                 {
                     Network_Entity entity = entityInParent.entity;
-                    if (entity != null && !entity.IsDead)
+                    if (entity != null && !entity.IsDead && (entity.entityType != EntityType.Player || GameManager.FriendlyFire))
                     {
                         weapon.OnMeleeStart();
                         if (goThroughInvurnability && entity.IsInvurnerable)
