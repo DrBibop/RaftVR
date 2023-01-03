@@ -51,7 +51,9 @@ namespace RaftVR.Utils
 
         internal static FieldInfo throwableCanThrowField = AccessTools.Field(typeof(ThrowableComponent), "canThrow");
 
-        internal static FieldInfo characterModelNetworkPlayer = AccessTools.Field(typeof(CharacterModelModifications), "playerNetwork");
+        internal static FieldInfo characterModelNetworkPlayerField = AccessTools.Field(typeof(CharacterModelModifications), "playerNetwork");
+
+        internal static FieldInfo equipmentModelNetworkPlayerField = AccessTools.Field(typeof(Equipment_Model), "playerNetwork");
 
         // Methods
         internal static MethodInfo usableItemUse = AccessTools.Method(typeof(UseItemController), "Use");

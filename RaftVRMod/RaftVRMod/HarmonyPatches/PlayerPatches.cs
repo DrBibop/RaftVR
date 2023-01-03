@@ -375,5 +375,49 @@ namespace RaftVR.HarmonyPatches
 
             return true;
         }
+
+        [HarmonyPatch(typeof(Equipment_Model), "SetModelState")]
+        [HarmonyPrefix]
+        static bool AlwaysHideHatModels(Equipment_Model __instance, ref bool state)
+        {
+            if (state && ((Network_Player)ReflectionInfos.equipmentModelNetworkPlayerField.GetValue(__instance)).IsLocalPlayer && (__instance is Equipment_Hat || __instance is Equipment_Helmet))
+            {
+                state = false;
+            }
+
+            return true;
+        }
+
+        [HarmonyPatch(typeof(Equipment_Model), "SetModelState")]
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> ShowEquipmentModels(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            int codeIndex = codes.FindIndex(x => x.opcode == OpCodes.Stloc_0);
+
+            if (codeIndex != -1)
+            {
+                codeIndex -= 4;
+                codes.RemoveRange(codeIndex, 4);
+
+                var newCodes = new List<CodeInstruction>() 
+                {
+                    new CodeInstruction(OpCodes.Isinst, typeof(Equipment_Hat)),
+                    new CodeInstruction(OpCodes.Ldnull),
+                    new CodeInstruction(OpCodes.Cgt_Un),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Isinst, typeof(Equipment_Helmet)),
+                    new CodeInstruction(OpCodes.Ldnull),
+                    new CodeInstruction(OpCodes.Cgt_Un),
+                    new CodeInstruction(OpCodes.Or),
+                    new CodeInstruction(OpCodes.Not)
+                };
+
+                codes.InsertRange(codeIndex, newCodes);
+            }
+
+            return codes.AsEnumerable();
+        }
     }
 }
