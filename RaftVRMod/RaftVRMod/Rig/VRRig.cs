@@ -651,8 +651,13 @@ namespace RaftVR.Rig
                 }
 
                 Vector3 playerAngles = player.transform.eulerAngles;
-                playerAngles.y = Quaternion.LookRotation(Vector3.Cross(Head.right, Vector3.up), Vector3.up).eulerAngles.y;
-                player.transform.eulerAngles = playerAngles;
+                Vector3 flatForward = Vector3.Cross(Head.right, Vector3.up);
+
+                if (flatForward != Vector3.zero)
+                {
+                    playerAngles.y = Quaternion.LookRotation(flatForward, Vector3.up).eulerAngles.y;
+                    player.transform.eulerAngles = playerAngles;
+                }
             }
 
             if (cameraHolder)

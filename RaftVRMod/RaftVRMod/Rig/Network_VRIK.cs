@@ -14,7 +14,7 @@ namespace RaftVR.Rig
         internal const Messages MSG_LEFT_HAND = (Messages)(-131);
         internal const Messages MSG_RIGHT_HAND = (Messages)(-132);
 
-        private const int SEND_RATE = 20;
+        private const int SEND_RATE = 15;
 
         private float sendDelay;
 
@@ -102,6 +102,11 @@ namespace RaftVR.Rig
 
         private void LateUpdate()
         {
+            if (!initialized) return;
+
+            if (vrik.enabled == (playerNetwork.PlayerScript.IsDead || playerNetwork.BedComponent.Sleeping))
+                vrik.enabled = !playerNetwork.PlayerScript.IsDead && !playerNetwork.BedComponent.Sleeping;
+
             if (playerNetwork.IsLocalPlayer)
             {
                 if (sendDelay >= 0)
@@ -137,7 +142,7 @@ namespace RaftVR.Rig
                     playerNetwork.Network.SendP2P(playerNetwork.Network.HostID, messages, EP2PSend.k_EP2PSendReliable, NetworkChannel.Channel_Game);
                 }
             }
-            else if (initialized)
+            else
             {
                 Vector3 vel = Vector3.zero;
                 Quaternion der = Quaternion.identity;
@@ -155,9 +160,7 @@ namespace RaftVR.Rig
 
         public override bool Deserialize(Message_NetworkBehaviour msg, CSteamID remoteID)
         {
-            if (!(msg is Message_AxeHit)) return false;
-
-            Message_AxeHit message = msg as Message_AxeHit;
+            if (!(msg is Message_AxeHit message)) return false;
 
             Vector3 localPos = message.HitPoint;
             Quaternion localRot = Quaternion.Euler(message.HitNormal);
@@ -165,12 +168,26 @@ namespace RaftVR.Rig
             switch (msg.Type)
             {
                 case MSG_HEAD:
+                    float armScale = Mathf.Round(message.treeObjectIndex / 1000f) / 100f;
+                    float legScale = (message.treeObjectIndex / 100f) % 10;
                     if (!initialized)
                     {
-                        float armScale = Mathf.Round(message.treeObjectIndex / 1000f) / 100f;
-                        float legScale = (message.treeObjectIndex / 100f) % 10;
                         bool leftHanded = (message.treeObjectIndex / 1000000) == 1;
                         Initialize(armScale, legScale, leftHanded);
+                    }
+                    else
+                    {
+                        if (vrik.solver.leftArm.armLengthMlp != armScale)
+                        {
+                            vrik.solver.leftArm.armLengthMlp = armScale;
+                            vrik.solver.rightArm.armLengthMlp = armScale;
+                        }
+
+                        if (vrik.solver.leftLeg.legLengthMlp != legScale)
+                        {
+                            vrik.solver.leftLeg.legLengthMlp = legScale;
+                            vrik.solver.rightLeg.legLengthMlp = legScale;
+                        }
                     }
                     headTarget.localPosition = localPos;
                     headTarget.localRotation = localRot;
@@ -321,6 +338,8 @@ namespace RaftVR.Rig
         private void SetupAnimationController()
         {
             Animator anim = playerNetwork.Animator.anim;
+
+            anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             AnimatorOverrideController fpController = playerNetwork.currentModel.firstPersonController as AnimatorOverrideController;
 

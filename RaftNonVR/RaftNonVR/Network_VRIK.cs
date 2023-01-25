@@ -107,6 +107,9 @@ namespace RaftNonVR
         {
             if (!initialized) return;
 
+            if (vrik.enabled == (playerNetwork.PlayerScript.IsDead || playerNetwork.BedComponent.Sleeping))
+                vrik.enabled = !playerNetwork.PlayerScript.IsDead && !playerNetwork.BedComponent.Sleeping;
+
             Vector3 vel = Vector3.zero;
             Quaternion der = Quaternion.identity;
 
@@ -122,9 +125,7 @@ namespace RaftNonVR
 
         public override bool Deserialize(Message_NetworkBehaviour msg, CSteamID remoteID)
         {
-            if (!(msg is Message_AxeHit)) return false;
-
-            Message_AxeHit message = msg as Message_AxeHit;
+            if (!(msg is Message_AxeHit message)) return false;
 
             Vector3 localPos = message.HitPoint;
             Quaternion localRot = Quaternion.Euler(message.HitNormal);
@@ -132,12 +133,26 @@ namespace RaftNonVR
             switch (msg.Type)
             {
                 case MSG_HEAD:
+                    float armScale = Mathf.Round(message.treeObjectIndex / 1000f) / 100f;
+                    float legScale = (message.treeObjectIndex / 100f) % 10;
                     if (!initialized)
                     {
-                        float armScale = Mathf.Round(message.treeObjectIndex / 1000f) / 100f;
-                        float legScale = (message.treeObjectIndex / 100f) % 10;
                         bool leftHanded = (message.treeObjectIndex / 1000000) == 1;
                         Initialize(armScale, legScale, leftHanded);
+                    }
+                    else
+                    {
+                        if (vrik.solver.leftArm.armLengthMlp != armScale)
+                        {
+                            vrik.solver.leftArm.armLengthMlp = armScale;
+                            vrik.solver.rightArm.armLengthMlp = armScale;
+                        }
+
+                        if (vrik.solver.leftLeg.legLengthMlp != legScale)
+                        {
+                            vrik.solver.leftLeg.legLengthMlp = legScale;
+                            vrik.solver.rightLeg.legLengthMlp = legScale;
+                        }
                     }
                     headTarget.localPosition = localPos;
                     headTarget.localRotation = localRot;
@@ -282,6 +297,8 @@ namespace RaftNonVR
         private void SetupAnimationController()
         {
             Animator anim = playerNetwork.Animator.anim;
+
+            anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             AnimatorOverrideController fpController = playerNetwork.currentModel.firstPersonController as AnimatorOverrideController;
 

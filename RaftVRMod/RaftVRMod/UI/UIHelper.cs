@@ -9,6 +9,7 @@ namespace RaftVR.UI
     public class UIHelper
     {
         private static Canvas settingsCanvas;
+        private static Canvas consoleCanvas;
 
         private static List<Canvas> permanentCanvases = new List<Canvas>();
 
@@ -98,19 +99,40 @@ namespace RaftVR.UI
             VRRig.instance.AddWorldCanvas(Object.FindObjectOfType<StartMenuScreen>().GetComponent<Canvas>(), Quaternion.identity);
         }
 
-        internal static void InitSettingsCanvas()
+        internal static void InitPermanentCanvases()
+        {
+            InitSettingsCanvas();
+            InitLoadingScreen();
+            InitConsoleCanvas();
+        }
+
+        private static void InitSettingsCanvas()
         {
             settingsCanvas = ComponentManager<Settings>.Value.GetComponentInChildren<Canvas>(true);
             MoveSettingsCanvasToFront();
             AddPermanentCanvas(settingsCanvas);
         }
 
-        internal static void InitLoadingScreen()
+        private static void InitLoadingScreen()
         {
             Canvas loadingScreen = ComponentManager<Raft_Network>.Value.gameObject.GetComponentInChildren<Canvas>(true);
 
             VRRig.instance.AddWorldCanvas(loadingScreen, Quaternion.identity);
             AddPermanentCanvas(loadingScreen);
+        }
+
+        private static void InitConsoleCanvas()
+        {
+            consoleCanvas = HMLLibrary.HConsole.instance.transform.Find("RConsole").GetComponent<Canvas>();
+
+            VRRig.instance.AddWorldCanvas(consoleCanvas, Quaternion.identity);
+            AddPermanentCanvas(consoleCanvas);
+        }
+
+        internal static void SetConsoleActive(bool active)
+        {
+            if (consoleCanvas.gameObject.activeSelf != active)
+                consoleCanvas.gameObject.SetActive(active);
         }
 
         internal static void MoveSettingsCanvasToFront()

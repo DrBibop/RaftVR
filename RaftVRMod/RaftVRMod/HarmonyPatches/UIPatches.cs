@@ -81,5 +81,28 @@ namespace RaftVR.HarmonyPatches
             craftMenuRect.offsetMin = new Vector2(193, -204);
             craftMenuRect.offsetMax = new Vector2(243, -154);
         }
+
+        [HarmonyPatch(typeof(RaftModLoader.RConsole), "LateUpdate")]
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> RConsole_PreventInputFieldActivation(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            int codeIndex = codes.FindIndex(x => x.Calls(AccessTools.Method(typeof(RaftModLoader.RConsole), "EnableInputfieldLate")));
+
+            if (codeIndex != -1)
+            {
+                codes.RemoveRange(codeIndex - 2, 5);
+            }
+
+            return codes.AsEnumerable();
+        }
+
+        [HarmonyPatch(typeof(RaftModLoader.RConsole), "LateUpdate")]
+        [HarmonyPostfix]
+        static void RConsole_ToggleCanvas()
+        {
+            UIHelper.SetConsoleActive(RaftModLoader.RConsole.isOpen);
+        }
     }
 }

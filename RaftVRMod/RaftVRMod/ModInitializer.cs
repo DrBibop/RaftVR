@@ -108,8 +108,7 @@ namespace RaftVR
                 VRRig.instance.AddWorldCanvas(rmlMenu, Quaternion.identity);
                 UIHelper.AddPermanentCanvas(rmlMenu);
 
-                UIHelper.InitSettingsCanvas();
-                UIHelper.InitLoadingScreen();
+                UIHelper.InitPermanentCanvases();
 
                 EventSystem.current.gameObject.AddComponent<VRPointerInputModule>();
                 Destroy(EventSystem.current.GetComponent<StandaloneInputModule>());
