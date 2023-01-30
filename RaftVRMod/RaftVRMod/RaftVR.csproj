@@ -393,8 +393,8 @@
     <EmbeddedResource Include="Patching\Bindings\bindings_vive_controller.json" />
     <EmbeddedResource Include="Patching\Bindings\bindings_vive_cosmos_controller.json" />
     <EmbeddedResource Include="Patching\Bindings\actions.json" />
-    <EmbeddedResource Include="Resources\vrassets" />
     <EmbeddedResource Include="Resources\animclips" />
+    <None Include="Resources\vrassets" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

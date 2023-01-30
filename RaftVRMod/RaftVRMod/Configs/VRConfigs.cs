@@ -28,7 +28,7 @@ namespace RaftVR.Configs
         private static float _uiScale = 1f;
         private static RadialHotbarMode _useRadialHotbar = RadialHotbarMode.Always;
         private static PlayspaceCenterDisplay _playspaceCenterDisplay = PlayspaceCenterDisplay.WhenFar;
-        private static bool _visibleBody = false;
+        private static bool _visibleBody = true;
         private static bool _underwaterDistortion = false;
         private static float _armScale = 1;
         private static float _legScale = 1;
